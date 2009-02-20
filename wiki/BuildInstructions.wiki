@@ -4,9 +4,13 @@
 
 This page explains how to build the project in eclipse. If you haven't used eclipse or programmed for android before, please see the [http://developer.android.com/ Android Eclipse tutorials]
 
-
-= Details =
+= Checking Out Into Eclipse =
 
   * Install [http://subclipse.tigris.org/ Subclipse], the subversion plugin for eclipse.
   * In Eclipse, go to Window -> Open Repository -> Other... and select "SVN Repository Browsing"
-  * In SVN Repositories, right-click, New -> Repository Location, and add {{{"http://boxeeremote.googlecode.com/svn/trunk/ boxeeremote-read-only"}}}
+  * In SVN Repositories, right-click, New -> Repository Location, and add "http://boxeeremote.googlecode.com/svn/trunk/"
+  * Expand the new repository, and right-click on "Boxee Remote" and select Checkout. The defaults should be fine, so press OK.
+
+= Running =
+
+Run it as you would a normal android project. One trick is that you need to disable the "Require Wifi Connection" preference, since the emulator pretends that it's on a mobile network, not wifi.
