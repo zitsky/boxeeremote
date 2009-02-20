@@ -1,5 +1,5 @@
 #summary Instructions for setting the project up in eclipse.
-#labels Phase-Deploy,Featured
+#labels Phase-Implementation
 
 = Introduction =
 
