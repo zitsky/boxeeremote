@@ -43,7 +43,7 @@ class CurrentlyPlayingThread extends Thread {
 		final String request = mRemote.getRequestPrefix() + "getcurrentlyplaying()";
 		BlockingHttpRequest r;
 		r = new BlockingHttpRequest(request);
-		r.run();
+		r.fetch();
 		if (!r.success()) {
 			return false;
 		}
@@ -55,7 +55,7 @@ class CurrentlyPlayingThread extends Thread {
 		final String request = mRemote.getRequestPrefix() + String.format("getthumbnail(%s)", URLEncoder.encode(mPlaying.getThumbnailUrl()));
 		BlockingHttpRequest r;
 		r = new BlockingHttpRequest(request);
-		r.run();
+		r.fetch();
 		if (!r.success()) {
 			return false;
 		}
