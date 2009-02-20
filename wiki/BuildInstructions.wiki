@@ -14,3 +14,5 @@ This page explains how to build the project in eclipse. If you haven't used ecli
 = Running =
 
 Run it as you would a normal android project. One trick is that you need to disable the "Require Wifi Connection" preference, since the emulator pretends that it's on a mobile network, not wifi.
+
+If you want to install it on your phone, you'll need to sign the package with your own key (see the [http://developer.android.com/guide/publishing/app-signing.html Android instructions on signing your application]). Since your key isn't the same as the official one, you should uninstall the version of Boxee Remote you downloaded from the marketplace first.
