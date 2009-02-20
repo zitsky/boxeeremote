@@ -1,0 +1,13 @@
+#summary Instructions for setting the project up in eclipse.
+
+= Introduction =
+
+This page explains how to build the project in eclipse. If you haven't used eclipse or programmed for android before, please see the <a href="http://developer.android.com/"Android Eclipse tutorials</a>
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
