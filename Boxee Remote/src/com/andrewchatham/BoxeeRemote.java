@@ -2,7 +2,6 @@ package com.andrewchatham;
 
 import java.net.MalformedURLException;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -37,19 +36,19 @@ public class BoxeeRemote extends Activity implements
 	private boolean mRequireWifi;
 
 	private NetworkInfo mWifiInfo;
-	
+
 	private final static int CODE_LEFT = 272;
 	private final static int CODE_RIGHT = 273;
 	private final static int CODE_UP = 270;
 	private final static int CODE_DOWN = 271;
 	private final static int CODE_SELECT = 256;
 	private final static int CODE_BACK = 257;
-	
+
 	final int KEY_ASCII = 0xF100;
 	final int KEY_INVALID = 0xFFFF;
 
 	// TODO: getmedialocation(video)
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,14 +64,14 @@ public class BoxeeRemote extends Activity implements
 
 		setPreferences(prefs);
 		prefs.registerOnSharedPreferenceChangeListener(this);
-		
+
 		setButtonAction(R.id.left, CODE_LEFT);
 		setButtonAction(R.id.right, CODE_RIGHT);
 		setButtonAction(R.id.up, CODE_UP);
 		setButtonAction(R.id.down, CODE_DOWN);
 		setButtonAction(R.id.select, CODE_SELECT);
 		setButtonAction(R.id.back, CODE_BACK);
-		
+
 		getThumbnail();
 	}
 
@@ -86,12 +85,18 @@ public class BoxeeRemote extends Activity implements
 
 		return true;
 	}
-	
+
 	final int THUMBNAIL_DELAY_MS = 1000 * 10;
+
+	/**
+	 * Set the thumbnail image and schedule another fetch of the thumbnail after a few seconds.
+	 * 
+	 *   @param bmp bitmap to set as the thumbnail, may be null
+	 */
 	public void setThumbnail(Bitmap bmp) {
 		ImageView view = (ImageView) findViewById(R.id.thumbnail);
 		view.setImageBitmap(bmp);
-				
+
 		// Schedule another attempt to get the thumbnail.
 		Handler h = new Handler();
 		Runnable r = new Runnable() {
@@ -101,11 +106,11 @@ public class BoxeeRemote extends Activity implements
 		};
 		h.postDelayed(r, THUMBNAIL_DELAY_MS);
 	}
-	
+
 	private void getThumbnail() {
 		new CurrentlyPlayingThread(BoxeeRemote.this).start();
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		int code = eventToBoxeeCode(keyCode, event);
@@ -116,9 +121,9 @@ public class BoxeeRemote extends Activity implements
 			return super.onKeyDown(keyCode, event);
 		}
 	}
-	
+
 	private int eventToBoxeeCode(int keyCode, KeyEvent event) {
- 		KeyData keyData = new KeyData();
+		KeyData keyData = new KeyData();
 		event.getKeyData(keyData);
 		Log.d(TAG, "Unicode is " + event.getUnicodeChar());
 
@@ -138,25 +143,24 @@ public class BoxeeRemote extends Activity implements
 			return CODE_LEFT;
 		case KeyEvent.KEYCODE_DPAD_RIGHT:
 			return CODE_RIGHT;
-		
+
 		case KeyEvent.KEYCODE_SPACE:
 		case KeyEvent.KEYCODE_ENTER:
 			// Some special keycodes we can translate from ASCII
 			return event.getUnicodeChar() + KEY_ASCII;
 		}
-		
+
 		if (Character.isLetterOrDigit(keyData.displayLabel)) {
 			return event.getUnicodeChar() + KEY_ASCII;
 		}
 		return KEY_INVALID;
 	}
-	
+
 	public String getRequestPrefix() {
-		return String.format(
- 				"http://%s:%d/xbmcCmds/xbmcHttp?command=",
-				mHost, mPort);
+		return String.format("http://%s:%d/xbmcCmds/xbmcHttp?command=", mHost,
+				mPort);
 	}
-	
+
 	private void sendKeyPress(int keycode, final boolean fromAction) {
 		if (mHost == null || mHost.length() == 0) {
 			ShowError("Go to settings and set the host");
@@ -179,29 +183,38 @@ public class BoxeeRemote extends Activity implements
 			return;
 		}
 
-		final String request = getRequestPrefix() + String.format("SendKey(%d)", keycode);
+		final String request = getRequestPrefix()
+				+ String.format("SendKey(%d)", keycode);
 		Log.d(TAG, "Fetching " + request);
 
 		try {
 			new HttpRequest(request, new HttpRequest.Handler() {
 				public void HandleResponse(boolean success, String resp) {
 					if (!success) {
-						ShowErrorAsync("Problem fetching URL "
-								+ request);
+						ShowErrorAsync("Problem fetching URL " + request);
 						if (fromAction)
-							  setResult(RESULT_CANCELED);
+							setResult(RESULT_CANCELED);
 					}
 					if (fromAction)
-					  setResult(RESULT_OK);
+						setResult(RESULT_OK);
 				}
 			});
 		} catch (MalformedURLException e) {
 			ShowErrorAsync("Malformed URL: " + request);
 			if (fromAction)
-			  setResult(RESULT_CANCELED);
+				setResult(RESULT_CANCELED);
 		}
 	}
 
+	/**
+	 * Set up a navigation button in the UI. Sets the focus to false so that we
+	 * can capture KEYCODE_DPAD_CENTER.
+	 * 
+	 * @param id id of the button in the resource file
+	 * 
+	 * @param keycode keycode we should send to boxee when this button is
+	 * pressed
+	 */
 	private void setButtonAction(int id, final int keycode) {
 		ImageButton button = (ImageButton) findViewById(id);
 		button.setFocusable(false);
@@ -212,23 +225,37 @@ public class BoxeeRemote extends Activity implements
 		});
 	}
 
-
+	/**
+	 * Display an error from R.strings
+	 * 
+	 * @param id an id from R.strings
+	 */
 	private void ShowError(int id) {
 		ShowError(getString(id));
 	}
 
+	/**
+	 * Display a short error via a popup message.
+	 */
 	private void ShowError(String s) {
 		Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
 	}
 
+	/**
+	 * Show an error, but can be called from any thread.
+	 */
 	private void ShowErrorAsync(final String s) {
- 		runOnUiThread(new Runnable() {
+		runOnUiThread(new Runnable() {
 			public void run() {
 				ShowError(s);
 			}
 		});
 	}
 
+	/**
+	 * 
+	 * @param prefs
+	 */
 	private void setPreferences(SharedPreferences prefs) {
 		try {
 			mPort = Integer.parseInt(prefs.getString(
@@ -240,10 +267,11 @@ public class BoxeeRemote extends Activity implements
 		mHost = prefs.getString(getString(R.string.host_key), null);
 		mRequireWifi = prefs.getBoolean(getString(R.string.require_wifi_key),
 				true);
-		
-		boolean hidden = 
-			prefs.getBoolean(getString(R.string.hide_arrows), false);
-		findViewById(R.id.table).setVisibility(hidden ? View.GONE : View.VISIBLE);
+
+		boolean hidden = prefs.getBoolean(getString(R.string.hide_arrows),
+				false);
+		findViewById(R.id.table).setVisibility(
+				hidden ? View.GONE : View.VISIBLE);
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String pref) {
