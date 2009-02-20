@@ -52,6 +52,8 @@ public class BoxeeRemote extends Activity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		new Discoverer().start();
 
 		ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		mWifiInfo = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
