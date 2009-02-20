@@ -7,6 +7,6 @@ This page explains how to build the project in eclipse. If you haven't used ecli
 
 = Details =
 
-* Install [http://subclipse.tigris.org/ Subclipse], the subversion plugin for eclipse.
-* In Eclipse, go to Window -> Open Repository -> Other... and select "SVN Repository Browsing"
-* In SVN Repositories, right-click, New -> Repository Location, and add "http://boxeeremote.googlecode.com/svn/trunk/ boxeeremote-read-only"
+  * Install [http://subclipse.tigris.org/ Subclipse], the subversion plugin for eclipse.
+  * In Eclipse, go to Window -> Open Repository -> Other... and select "SVN Repository Browsing"
+  * In SVN Repositories, right-click, New -> Repository Location, and add "http://boxeeremote.googlecode.com/svn/trunk/ boxeeremote-read-only"
