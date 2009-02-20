@@ -1,0 +1,16 @@
+#summary Instructions on how to use Boxee Remote
+#labels Featured
+
+= Installation =
+
+If you haven't already done so, install the application from the Android Market on your phone.
+
+= Setting Up Boxee =
+
+Hopefully you've already installed [http://www.boxee.tv/ Boxee]. Within Boxee, go to the Settings menu. Select Network, and then Servers. Within Servers, make sure that "Enable Web Server" is checked, and remember the value of "Web Server Port". If you want, set a password so that other people on your network can't mess with your Boxee.
+
+= Setting Up Boxee Remote =
+
+The first thing you need to do when you start the application on your phone is to go to the settings page (Menu->Settings) and enter the IP address or hostname of your Boxee computer.
+
+Connect your phone to the same network as your Boxee machine belongs to. You should be able to use the trackball to navigate around Boxee. Press in on the trackball to select an item, and press the back button (next to the Home key) to go back. If Boxee wants you to enter any text, you can type it in using your phone's keyboard.
