@@ -89,9 +89,11 @@ public class BoxeeRemote extends Activity implements
 	final int THUMBNAIL_DELAY_MS = 1000 * 10;
 
 	/**
-	 * Set the thumbnail image and schedule another fetch of the thumbnail after a few seconds.
+	 * Set the thumbnail image and schedule another fetch of the thumbnail after
+	 * a few seconds.
 	 * 
-	 *   @param bmp bitmap to set as the thumbnail, may be null
+	 * @param bmp
+	 *            bitmap to set as the thumbnail, may be null
 	 */
 	public void setThumbnail(Bitmap bmp) {
 		ImageView view = (ImageView) findViewById(R.id.thumbnail);
@@ -111,6 +113,9 @@ public class BoxeeRemote extends Activity implements
 		new CurrentlyPlayingThread(BoxeeRemote.this).start();
 	}
 
+	/**
+	 * Handler an android keypress and send it to boxee if appropriate.
+	 */
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		int code = eventToBoxeeCode(keyCode, event);
@@ -122,6 +127,13 @@ public class BoxeeRemote extends Activity implements
 		}
 	}
 
+	/**
+	 * Translate an android key event into a boxee keycode.
+	 * 
+	 * @param keyCode keycode from onKeyDown
+	 * @param event key event from onKeyDown
+	 * @return argument to boxee's sendKey function
+	 */
 	private int eventToBoxeeCode(int keyCode, KeyEvent event) {
 		KeyData keyData = new KeyData();
 		event.getKeyData(keyData);
@@ -156,6 +168,11 @@ public class BoxeeRemote extends Activity implements
 		return KEY_INVALID;
 	}
 
+	/**
+	 * Return the HTTP request prefix for sending boxee a command.
+	 * 
+	 * @return URL to send to boxee, up to but not including the boxee command
+	 */
 	public String getRequestPrefix() {
 		return String.format("http://%s:%d/xbmcCmds/xbmcHttp?command=", mHost,
 				mPort);
@@ -210,10 +227,11 @@ public class BoxeeRemote extends Activity implements
 	 * Set up a navigation button in the UI. Sets the focus to false so that we
 	 * can capture KEYCODE_DPAD_CENTER.
 	 * 
-	 * @param id id of the button in the resource file
+	 * @param id
+	 *            id of the button in the resource file
 	 * 
-	 * @param keycode keycode we should send to boxee when this button is
-	 * pressed
+	 * @param keycode
+	 *            keycode we should send to boxee when this button is pressed
 	 */
 	private void setButtonAction(int id, final int keycode) {
 		ImageButton button = (ImageButton) findViewById(id);
@@ -228,7 +246,8 @@ public class BoxeeRemote extends Activity implements
 	/**
 	 * Display an error from R.strings
 	 * 
-	 * @param id an id from R.strings
+	 * @param id
+	 *            an id from R.strings
 	 */
 	private void ShowError(int id) {
 		ShowError(getString(id));
@@ -253,6 +272,8 @@ public class BoxeeRemote extends Activity implements
 	}
 
 	/**
+	 * Set the state of the application based on prefs. This should be called
+	 * after every preference change or when starting up.
 	 * 
 	 * @param prefs
 	 */
@@ -274,6 +295,9 @@ public class BoxeeRemote extends Activity implements
 				hidden ? View.GONE : View.VISIBLE);
 	}
 
+	/**
+	 * Callback when user alters preferences. 
+	 */
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String pref) {
 		setPreferences(prefs);
 	}
