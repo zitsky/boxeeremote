@@ -7,7 +7,7 @@ If you haven't already done so, install the application from the Android Market 
 
 = Setting Up Boxee =
 
-Hopefully you've already installed [http://www.boxee.tv/ Boxee]. Within Boxee, go to the Settings menu. Select Network, and then Servers. Within Servers, make sure that "Enable Web Server" is checked, and remember the value of "Web Server Port". If you want, set a password so that other people on your network can't mess with your Boxee.
+Hopefully you've already installed [http://www.boxee.tv/ Boxee]. Within Boxee, go to the Settings menu. Select Network, and then Servers. Within Servers, make sure that "Enable Web Server" is checked, and remember the value of "Web Server Port".
 
 = Setting Up Boxee Remote =
 
