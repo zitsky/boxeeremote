@@ -4,7 +4,7 @@
 
 This page explains how to build the project in eclipse. If you haven't used eclipse or programmed for android before, please see the [http://developer.android.com/ Android Eclipse tutorials]
 
-= Checking Out Into Eclipse =
+= Checking Out the Code =
 
   * Install [http://subclipse.tigris.org/ Subclipse], the subversion plugin for eclipse.
   * In Eclipse, go to Window -> Open Repository -> Other... and select "SVN Repository Browsing"
