@@ -32,4 +32,8 @@
 	<string name="timeout_key">timeout</string>
 	<string name="timeout_summary">Timeout for HTTP requests in milliseconds</string>
 <string name="timeout_title">Timeout</string>
+<string name="advanced_key">advanced</string>
+<string name="advanced_on">Show advanced options</string>
+<string name="advanced_off">Hide advanced options</string>
+<string name="advanced_title">Advanced Options</string>
 </resources>

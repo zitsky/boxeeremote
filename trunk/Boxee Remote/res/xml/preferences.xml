@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen   xmlns:android="http://schemas.android.com/apk/res/android"> 
-<CheckBoxPreference android:summaryOn="@string/hide_arrows_yes" android:summaryOff="@string/hide_arrows_no" android:title="@string/hide_arrows_title" android:key="@string/hide_arrows"></CheckBoxPreference><EditTextPreference android:title="@string/host_title" android:key="@string/host_key" android:summary="@string/host_summary"></EditTextPreference>
-<EditTextPreference android:defaultValue="8800" android:title="@string/port_title" android:key="@string/port_key" android:summary="@string/port_summary"></EditTextPreference>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<CheckBoxPreference android:summaryOn="@string/hide_arrows_yes"
+		android:summaryOff="@string/hide_arrows_no" android:title="@string/hide_arrows_title"
+		android:key="@string/hide_arrows"></CheckBoxPreference>
+	<EditTextPreference android:title="@string/host_title"
+		android:key="@string/host_key" android:summary="@string/host_summary"></EditTextPreference>
+	<EditTextPreference android:defaultValue="8800"
+		android:title="@string/port_title" android:key="@string/port_key"
+		android:summary="@string/port_summary"></EditTextPreference>
 
 
 
-<CheckBoxPreference android:key="@string/require_wifi_key" android:title="@string/require_wifi_title" android:summaryOn="@string/require_wifi_yes" android:summaryOff="@string/require_wifi_no" android:defaultValue="true"></CheckBoxPreference><EditTextPreference android:key="@string/discovered_name_key" android:title="@string/discovered_name" android:summary="@string/discovered_summary"></EditTextPreference>
+	<CheckBoxPreference android:key="@string/require_wifi_key"
+		android:title="@string/require_wifi_title" android:summaryOn="@string/require_wifi_yes"
+		android:summaryOff="@string/require_wifi_no" android:defaultValue="true"></CheckBoxPreference>
 
 
+	<CheckBoxPreference android:summaryOff="@string/advanced_off"
+		android:key="@string/advanced_key" android:summaryOn="@string/advanced_on"
+		android:title="@string/advanced_title" android:defaultValue="false" />
+	<EditTextPreference android:key="@string/discovered_name_key"
+		android:title="@string/discovered_name" android:summary="@string/discovered_summary"
+		android:dependency="@string/advanced_key" android:shouldDisableView="true"></EditTextPreference>
 
+	<EditTextPreference android:title="@string/timeout_title"
+		android:key="@string/timeout_key" android:summary="@string/timeout_summary"
+		android:defaultValue="2000" android:dependency="@string/advanced_key"
+		android:shouldDisableView="true"></EditTextPreference>
 
-
-<EditTextPreference android:title="@string/timeout_title" android:key="@string/timeout_key" android:summary="@string/timeout_summary" android:defaultValue="2000"></EditTextPreference>
 </PreferenceScreen>
