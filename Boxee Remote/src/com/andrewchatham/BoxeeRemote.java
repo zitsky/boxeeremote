@@ -1,6 +1,7 @@
 package com.andrewchatham;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,20 +21,32 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.KeyCharacterMap.KeyData;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 public class BoxeeRemote extends Activity implements
-    OnSharedPreferenceChangeListener {
-  private static final int BAD_PORT = -1;
+    OnSharedPreferenceChangeListener, Discoverer.Receiver {
+  static final int BAD_PORT = -1;
+
   public final static String TAG = BoxeeRemote.class.toString();
   public static final int PREFERENCES = Menu.FIRST;
   public static final int REQUEST_PREF = 1;
 
+  private final static int ACTIVITY_SCAN = 1;
+
+  private ArrayList<BoxeeServer> mServers;
+
   private String mHost;
-  private int mPort = BAD_PORT;
+  public static int mPort = BAD_PORT;
   private boolean mRequireWifi;
+
+  /**
+   * If the user has run a scan before, this is set to the name of their
+   * preferred server.
+   */
+  private String mAutoName;
 
   private NetworkInfo mWifiInfo;
 
@@ -47,14 +60,9 @@ public class BoxeeRemote extends Activity implements
   final int KEY_ASCII = 0xF100;
   final int KEY_INVALID = 0xFFFF;
 
-  // TODO: getmedialocation(video)
-
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    new Discoverer((WifiManager) getSystemService(Context.WIFI_SERVICE))
-        .start();
 
     ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     mWifiInfo = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -67,6 +75,13 @@ public class BoxeeRemote extends Activity implements
 
     setPreferences(prefs);
     prefs.registerOnSharedPreferenceChangeListener(this);
+
+    // Only send a discovery request if the user has done a scan before and
+    // picked a server.
+    if (mAutoName != null && mAutoName.length() > 0) {
+      new Discoverer((WifiManager) getSystemService(Context.WIFI_SERVICE), this)
+          .start();
+    }
 
     setButtonAction(R.id.left, CODE_LEFT);
     setButtonAction(R.id.right, CODE_RIGHT);
@@ -82,11 +97,44 @@ public class BoxeeRemote extends Activity implements
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
 
+    MenuItem scan = menu.add(getString(R.string.scan));
+    scan.setIcon(android.R.drawable.ic_menu_manage);
+    scan.setIntent(new Intent(this, Scan.class));
+    scan.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+      public boolean onMenuItemClick(MenuItem item) {
+        startActivityForResult(item.getIntent(), ACTIVITY_SCAN);
+        return true;
+      }
+    });
+
     MenuItem settings = menu.add(getString(R.string.settings));
     settings.setIcon(android.R.drawable.ic_menu_preferences);
     settings.setIntent(new Intent(this, Preferences.class));
 
+//    MenuItem help = menu.add(getString(R.string.help));
+//    help.setIcon(android.R.drawable.ic_menu_help);
+//    help.setIntent(new Intent(this, Preferences.class));
+
     return true;
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == ACTIVITY_SCAN) {
+      mHost = data.getStringExtra("host");
+      mPort = data.getIntExtra("port", BAD_PORT);
+      String name = data.getStringExtra("name");
+
+      // Change the preferences to indicate that we should autodiscover the
+      // server with this name next time.
+      SharedPreferences prefs = PreferenceManager
+          .getDefaultSharedPreferences(this);
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.putString(getString(R.string.discovered_name_key), name);
+      editor.putString(getString(R.string.host_key), "");
+      editor.commit();
+    }
   }
 
   final int THUMBNAIL_DELAY_MS = 1000 * 10;
@@ -179,8 +227,7 @@ public class BoxeeRemote extends Activity implements
    * @return URL to send to boxee, up to but not including the boxee command
    */
   public String getRequestPrefix() {
-    return String.format("http://%s:%d/xbmcCmds/xbmcHttp?command=", mHost,
-        mPort);
+    return String.format("http://%s:%d/xbmcCmds/xbmcHttp?command=", mHost, mPort);
   }
 
   private void sendKeyPress(int keycode, final boolean fromAction) {
@@ -292,6 +339,7 @@ public class BoxeeRemote extends Activity implements
     }
     mHost = prefs.getString(getString(R.string.host_key), null);
     mRequireWifi = prefs.getBoolean(getString(R.string.require_wifi_key), true);
+    mAutoName = prefs.getString(getString(R.string.discovered_name_key), null);
 
     boolean hidden = prefs.getBoolean(getString(R.string.hide_arrows), false);
     findViewById(R.id.table).setVisibility(hidden ? View.GONE : View.VISIBLE);
@@ -302,5 +350,36 @@ public class BoxeeRemote extends Activity implements
    */
   public void onSharedPreferenceChanged(SharedPreferences prefs, String pref) {
     setPreferences(prefs);
+  }
+
+  /**
+   * Called when the discovery request we sent in onCreate finishes. If we find
+   * a server matching mAutoName, we use that.
+   * 
+   * @param servers
+   *          list of discovered servers
+   */
+  public void addAnnouncedServers(ArrayList<BoxeeServer> servers) {
+    if (mHost != null && mHost.length() > 0) {
+      Log.d(TAG, "Skipping announced servers. Set manually");
+    }
+    
+    for (int k = 0; k < servers.size(); ++k) {
+      BoxeeServer server = servers.get(k);
+      if (server.name().equals(mAutoName)) {
+        if (!server.valid()) {
+          ShowErrorAsync(String.format("Found '%s' but looks broken", server
+              .name()));
+          continue;
+        } else {
+          // Yay, found it.
+          mHost = server.address().getHostAddress();
+          mPort = server.port();
+          return;
+        }
+      }
+    }
+    
+    ShowErrorAsync(String.format("Could not find preferred server '%s'", mAutoName));
   }
 }
