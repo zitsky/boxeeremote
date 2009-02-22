@@ -25,282 +25,282 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 public class BoxeeRemote extends Activity implements
-		OnSharedPreferenceChangeListener {
-	private static final int BAD_PORT = -1;
-	public final static String TAG = BoxeeRemote.class.toString();
-	public static final int PREFERENCES = Menu.FIRST;
-	public static final int REQUEST_PREF = 1;
+    OnSharedPreferenceChangeListener {
+  private static final int BAD_PORT = -1;
+  public final static String TAG = BoxeeRemote.class.toString();
+  public static final int PREFERENCES = Menu.FIRST;
+  public static final int REQUEST_PREF = 1;
 
-	private String mHost;
-	private int mPort = BAD_PORT;
-	private boolean mRequireWifi;
+  private String mHost;
+  private int mPort = BAD_PORT;
+  private boolean mRequireWifi;
 
-	private NetworkInfo mWifiInfo;
+  private NetworkInfo mWifiInfo;
 
-	private final static int CODE_LEFT = 272;
-	private final static int CODE_RIGHT = 273;
-	private final static int CODE_UP = 270;
-	private final static int CODE_DOWN = 271;
-	private final static int CODE_SELECT = 256;
-	private final static int CODE_BACK = 257;
+  private final static int CODE_LEFT = 272;
+  private final static int CODE_RIGHT = 273;
+  private final static int CODE_UP = 270;
+  private final static int CODE_DOWN = 271;
+  private final static int CODE_SELECT = 256;
+  private final static int CODE_BACK = 257;
 
-	final int KEY_ASCII = 0xF100;
-	final int KEY_INVALID = 0xFFFF;
+  final int KEY_ASCII = 0xF100;
+  final int KEY_INVALID = 0xFFFF;
 
-	// TODO: getmedialocation(video)
+  // TODO: getmedialocation(video)
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		new Discoverer((WifiManager) getSystemService(Context.WIFI_SERVICE)).start();
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-		ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		mWifiInfo = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+    new Discoverer((WifiManager) getSystemService(Context.WIFI_SERVICE))
+        .start();
 
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+    ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    mWifiInfo = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		setContentView(R.layout.remote);
+    PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-		setPreferences(prefs);
-		prefs.registerOnSharedPreferenceChangeListener(this);
+    SharedPreferences prefs = PreferenceManager
+        .getDefaultSharedPreferences(this);
+    setContentView(R.layout.remote);
 
-		setButtonAction(R.id.left, CODE_LEFT);
-		setButtonAction(R.id.right, CODE_RIGHT);
-		setButtonAction(R.id.up, CODE_UP);
-		setButtonAction(R.id.down, CODE_DOWN);
-		setButtonAction(R.id.select, CODE_SELECT);
-		setButtonAction(R.id.back, CODE_BACK);
+    setPreferences(prefs);
+    prefs.registerOnSharedPreferenceChangeListener(this);
 
-		getThumbnail();
-	}
+    setButtonAction(R.id.left, CODE_LEFT);
+    setButtonAction(R.id.right, CODE_RIGHT);
+    setButtonAction(R.id.up, CODE_UP);
+    setButtonAction(R.id.down, CODE_DOWN);
+    setButtonAction(R.id.select, CODE_SELECT);
+    setButtonAction(R.id.back, CODE_BACK);
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
+    getThumbnail();
+  }
 
-		MenuItem settings = menu.add(getString(R.string.settings));
-		settings.setIcon(android.R.drawable.ic_menu_preferences);
-		settings.setIntent(new Intent(this, Preferences.class));
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    super.onCreateOptionsMenu(menu);
 
-		return true;
-	}
+    MenuItem settings = menu.add(getString(R.string.settings));
+    settings.setIcon(android.R.drawable.ic_menu_preferences);
+    settings.setIntent(new Intent(this, Preferences.class));
 
-	final int THUMBNAIL_DELAY_MS = 1000 * 10;
+    return true;
+  }
 
-	/**
-	 * Set the thumbnail image and schedule another fetch of the thumbnail after
-	 * a few seconds.
-	 * 
-	 * @param bmp
-	 *            bitmap to set as the thumbnail, may be null
-	 */
-	public void setThumbnail(Bitmap bmp) {
-		ImageView view = (ImageView) findViewById(R.id.thumbnail);
-		view.setImageBitmap(bmp);
+  final int THUMBNAIL_DELAY_MS = 1000 * 10;
 
-		// Schedule another attempt to get the thumbnail.
-		Handler h = new Handler();
-		Runnable r = new Runnable() {
-			public void run() {
-				getThumbnail();
-			}
-		};
-		h.postDelayed(r, THUMBNAIL_DELAY_MS);
-	}
+  /**
+   * Set the thumbnail image and schedule another fetch of the thumbnail after a
+   * few seconds.
+   * 
+   * @param bmp
+   *          bitmap to set as the thumbnail, may be null
+   */
+  public void setThumbnail(Bitmap bmp) {
+    ImageView view = (ImageView) findViewById(R.id.thumbnail);
+    view.setImageBitmap(bmp);
 
-	private void getThumbnail() {
-		new CurrentlyPlayingThread(BoxeeRemote.this).start();
-	}
+    // Schedule another attempt to get the thumbnail.
+    Handler h = new Handler();
+    Runnable r = new Runnable() {
+      public void run() {
+        getThumbnail();
+      }
+    };
+    h.postDelayed(r, THUMBNAIL_DELAY_MS);
+  }
 
-	/**
-	 * Handler an android keypress and send it to boxee if appropriate.
-	 */
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		int code = eventToBoxeeCode(keyCode, event);
-		if (code != KEY_INVALID) {
-			sendKeyPress(code, false);
-			return true;
-		} else {
-			return super.onKeyDown(keyCode, event);
-		}
-	}
+  private void getThumbnail() {
+    new CurrentlyPlayingThread(BoxeeRemote.this).start();
+  }
 
-	/**
-	 * Translate an android key event into a boxee keycode.
-	 * 
-	 * @param keyCode keycode from onKeyDown
-	 * @param event key event from onKeyDown
-	 * @return argument to boxee's sendKey function
-	 */
-	private int eventToBoxeeCode(int keyCode, KeyEvent event) {
-		KeyData keyData = new KeyData();
-		event.getKeyData(keyData);
-		Log.d(TAG, "Unicode is " + event.getUnicodeChar());
+  /**
+   * Handler an android keypress and send it to boxee if appropriate.
+   */
+  @Override
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    int code = eventToBoxeeCode(keyCode, event);
+    if (code != KEY_INVALID) {
+      sendKeyPress(code, false);
+      return true;
+    } else {
+      return super.onKeyDown(keyCode, event);
+    }
+  }
 
-		// Certain events we hard-code to certain event codes.
-		switch (keyCode) {
-		case KeyEvent.KEYCODE_DEL:
-			return CODE_BACK;
-		case KeyEvent.KEYCODE_BACK:
-			return CODE_BACK;
-		case KeyEvent.KEYCODE_DPAD_CENTER:
-			return CODE_SELECT;
-		case KeyEvent.KEYCODE_DPAD_DOWN:
-			return CODE_DOWN;
-		case KeyEvent.KEYCODE_DPAD_UP:
-			return CODE_UP;
-		case KeyEvent.KEYCODE_DPAD_LEFT:
-			return CODE_LEFT;
-		case KeyEvent.KEYCODE_DPAD_RIGHT:
-			return CODE_RIGHT;
+  /**
+   * Translate an android key event into a boxee keycode.
+   * 
+   * @param keyCode
+   *          keycode from onKeyDown
+   * @param event
+   *          key event from onKeyDown
+   * @return argument to boxee's sendKey function
+   */
+  private int eventToBoxeeCode(int keyCode, KeyEvent event) {
+    KeyData keyData = new KeyData();
+    event.getKeyData(keyData);
+    Log.d(TAG, "Unicode is " + event.getUnicodeChar());
 
-		case KeyEvent.KEYCODE_SPACE:
-		case KeyEvent.KEYCODE_ENTER:
-			// Some special keycodes we can translate from ASCII
-			return event.getUnicodeChar() + KEY_ASCII;
-		}
+    // Certain events we hard-code to certain event codes.
+    switch (keyCode) {
+    case KeyEvent.KEYCODE_DEL:
+      return CODE_BACK;
+    case KeyEvent.KEYCODE_BACK:
+      return CODE_BACK;
+    case KeyEvent.KEYCODE_DPAD_CENTER:
+      return CODE_SELECT;
+    case KeyEvent.KEYCODE_DPAD_DOWN:
+      return CODE_DOWN;
+    case KeyEvent.KEYCODE_DPAD_UP:
+      return CODE_UP;
+    case KeyEvent.KEYCODE_DPAD_LEFT:
+      return CODE_LEFT;
+    case KeyEvent.KEYCODE_DPAD_RIGHT:
+      return CODE_RIGHT;
 
-		if (Character.isLetterOrDigit(keyData.displayLabel)) {
-			return event.getUnicodeChar() + KEY_ASCII;
-		}
-		return KEY_INVALID;
-	}
+    case KeyEvent.KEYCODE_SPACE:
+    case KeyEvent.KEYCODE_ENTER:
+      // Some special keycodes we can translate from ASCII
+      return event.getUnicodeChar() + KEY_ASCII;
+    }
 
-	/**
-	 * Return the HTTP request prefix for sending boxee a command.
-	 * 
-	 * @return URL to send to boxee, up to but not including the boxee command
-	 */
-	public String getRequestPrefix() {
-		return String.format("http://%s:%d/xbmcCmds/xbmcHttp?command=", mHost,
-				mPort);
-	}
+    if (Character.isLetterOrDigit(keyData.displayLabel)) {
+      return event.getUnicodeChar() + KEY_ASCII;
+    }
+    return KEY_INVALID;
+  }
 
-	private void sendKeyPress(int keycode, final boolean fromAction) {
-		if (mHost == null || mHost.length() == 0) {
-			ShowError("Go to settings and set the host");
-			if (fromAction)
-				setResult(RESULT_CANCELED);
-			return;
-		}
+  /**
+   * Return the HTTP request prefix for sending boxee a command.
+   * 
+   * @return URL to send to boxee, up to but not including the boxee command
+   */
+  public String getRequestPrefix() {
+    return String.format("http://%s:%d/xbmcCmds/xbmcHttp?command=", mHost,
+        mPort);
+  }
 
-		if (mPort == BAD_PORT) {
-			ShowError("Go to settings and set the port");
-			if (fromAction)
-				setResult(RESULT_CANCELED);
-			return;
-		}
+  private void sendKeyPress(int keycode, final boolean fromAction) {
+    if (mHost == null || mHost.length() == 0) {
+      ShowError("Go to settings and set the host");
+      if (fromAction)
+        setResult(RESULT_CANCELED);
+      return;
+    }
 
-		if (mRequireWifi && !mWifiInfo.isAvailable()) {
-			ShowError(R.string.no_wifi);
-			if (fromAction)
-				setResult(RESULT_CANCELED);
-			return;
-		}
+    if (mPort == BAD_PORT) {
+      ShowError("Go to settings and set the port");
+      if (fromAction)
+        setResult(RESULT_CANCELED);
+      return;
+    }
 
-		final String request = getRequestPrefix()
-				+ String.format("SendKey(%d)", keycode);
-		Log.d(TAG, "Fetching " + request);
+    if (mRequireWifi && !mWifiInfo.isAvailable()) {
+      ShowError(R.string.no_wifi);
+      if (fromAction)
+        setResult(RESULT_CANCELED);
+      return;
+    }
 
-		try {
-			new HttpRequest(request, new HttpRequest.Handler() {
-				public void HandleResponse(boolean success, String resp) {
-					if (!success) {
-						ShowErrorAsync("Problem fetching URL " + request);
-						if (fromAction)
-							setResult(RESULT_CANCELED);
-					}
-					if (fromAction)
-						setResult(RESULT_OK);
-				}
-			});
-		} catch (MalformedURLException e) {
-			ShowErrorAsync("Malformed URL: " + request);
-			if (fromAction)
-				setResult(RESULT_CANCELED);
-		}
-	}
+    final String request = getRequestPrefix()
+        + String.format("SendKey(%d)", keycode);
+    Log.d(TAG, "Fetching " + request);
 
-	/**
-	 * Set up a navigation button in the UI. Sets the focus to false so that we
-	 * can capture KEYCODE_DPAD_CENTER.
-	 * 
-	 * @param id
-	 *            id of the button in the resource file
-	 * 
-	 * @param keycode
-	 *            keycode we should send to boxee when this button is pressed
-	 */
-	private void setButtonAction(int id, final int keycode) {
-		ImageButton button = (ImageButton) findViewById(id);
-		button.setFocusable(false);
-		button.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				sendKeyPress(keycode, true);
-			}
-		});
-	}
+    try {
+      new HttpRequest(request, new HttpRequest.Handler() {
+        public void HandleResponse(boolean success, String resp) {
+          if (!success) {
+            ShowErrorAsync("Problem fetching URL " + request);
+            if (fromAction)
+              setResult(RESULT_CANCELED);
+          }
+          if (fromAction)
+            setResult(RESULT_OK);
+        }
+      });
+    } catch (MalformedURLException e) {
+      ShowErrorAsync("Malformed URL: " + request);
+      if (fromAction)
+        setResult(RESULT_CANCELED);
+    }
+  }
 
-	/**
-	 * Display an error from R.strings
-	 * 
-	 * @param id
-	 *            an id from R.strings
-	 */
-	private void ShowError(int id) {
-		ShowError(getString(id));
-	}
+  /**
+   * Set up a navigation button in the UI. Sets the focus to false so that we
+   * can capture KEYCODE_DPAD_CENTER.
+   * 
+   * @param id
+   *          id of the button in the resource file
+   * 
+   * @param keycode
+   *          keycode we should send to boxee when this button is pressed
+   */
+  private void setButtonAction(int id, final int keycode) {
+    ImageButton button = (ImageButton) findViewById(id);
+    button.setFocusable(false);
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View view) {
+        sendKeyPress(keycode, true);
+      }
+    });
+  }
 
-	/**
-	 * Display a short error via a popup message.
-	 */
-	private void ShowError(String s) {
-		Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
-	}
+  /**
+   * Display an error from R.strings
+   * 
+   * @param id
+   *          an id from R.strings
+   */
+  private void ShowError(int id) {
+    ShowError(getString(id));
+  }
 
-	/**
-	 * Show an error, but can be called from any thread.
-	 */
-	private void ShowErrorAsync(final String s) {
-		runOnUiThread(new Runnable() {
-			public void run() {
-				ShowError(s);
-			}
-		});
-	}
+  /**
+   * Display a short error via a popup message.
+   */
+  private void ShowError(String s) {
+    Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+  }
 
-	/**
-	 * Set the state of the application based on prefs. This should be called
-	 * after every preference change or when starting up.
-	 * 
-	 * @param prefs
-	 */
-	private void setPreferences(SharedPreferences prefs) {
-		try {
-			mPort = Integer.parseInt(prefs.getString(
-					getString(R.string.port_key), null));
-		} catch (NumberFormatException e) {
-			mPort = BAD_PORT;
-			ShowError("Port must be a number");
-		}
-		mHost = prefs.getString(getString(R.string.host_key), null);
-		mRequireWifi = prefs.getBoolean(getString(R.string.require_wifi_key),
-				true);
+  /**
+   * Show an error, but can be called from any thread.
+   */
+  private void ShowErrorAsync(final String s) {
+    runOnUiThread(new Runnable() {
+      public void run() {
+        ShowError(s);
+      }
+    });
+  }
 
-		boolean hidden = prefs.getBoolean(getString(R.string.hide_arrows),
-				false);
-		findViewById(R.id.table).setVisibility(
-				hidden ? View.GONE : View.VISIBLE);
-	}
+  /**
+   * Set the state of the application based on prefs. This should be called
+   * after every preference change or when starting up.
+   * 
+   * @param prefs
+   */
+  private void setPreferences(SharedPreferences prefs) {
+    try {
+      mPort = Integer.parseInt(prefs.getString(getString(R.string.port_key),
+          null));
+    } catch (NumberFormatException e) {
+      mPort = BAD_PORT;
+      ShowError("Port must be a number");
+    }
+    mHost = prefs.getString(getString(R.string.host_key), null);
+    mRequireWifi = prefs.getBoolean(getString(R.string.require_wifi_key), true);
 
-	/**
-	 * Callback when user alters preferences. 
-	 */
-	public void onSharedPreferenceChanged(SharedPreferences prefs, String pref) {
-		setPreferences(prefs);
-	}
+    boolean hidden = prefs.getBoolean(getString(R.string.hide_arrows), false);
+    findViewById(R.id.table).setVisibility(hidden ? View.GONE : View.VISIBLE);
+  }
+
+  /**
+   * Callback when user alters preferences.
+   */
+  public void onSharedPreferenceChanged(SharedPreferences prefs, String pref) {
+    setPreferences(prefs);
+  }
 }
