@@ -1,0 +1,11 @@
+#summary Sending and receiving UDP broadcast
+
+= Introduction =
+
+It took me forever to figure out how to send and receive UDP broadcast packets in android. This page explains how so others don't have to beat their heads against the wall.
+
+= Details =
+
+[http://code.google.com/p/boxeeremote/source/detail?spec=svn28&r=28 Example android UDP broadcast code]
+
+The important thing is that sending a broadcast packet that includes the mobile network will silently fail, so you need to restrict yourself to the wifi network.
