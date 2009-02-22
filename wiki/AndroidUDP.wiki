@@ -1,4 +1,4 @@
-#summary Sending and receiving UDP broadcast
+#summary Sending and receiving UDP broadcast packets in Android
 #labels Phase-Implementation
 
 = Introduction =
