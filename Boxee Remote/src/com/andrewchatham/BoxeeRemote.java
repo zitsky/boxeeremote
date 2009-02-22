@@ -10,6 +10,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -23,7 +24,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-// http://www.iconspedia.com/pack/crystal-clear-actions-1303/
 public class BoxeeRemote extends Activity implements
 		OnSharedPreferenceChangeListener {
 	private static final int BAD_PORT = -1;
@@ -53,7 +53,7 @@ public class BoxeeRemote extends Activity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		new Discoverer().start();
+		new Discoverer((WifiManager) getSystemService(Context.WIFI_SERVICE)).start();
 
 		ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		mWifiInfo = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
