@@ -27,9 +27,9 @@ class BlockingHttpRequest {
 		}
 	}
 
-	/**
-	 * Returns whether the fetch resulted in a 200.
-	 */
+  /**
+   * Returns whether the fetch resulted in a 200.
+   */
 	boolean success() {
 		return mSuccess;
 	}
