@@ -16,7 +16,12 @@ class BlockingHttpRequest {
 	private URL mUrl;
 	private boolean mSuccess;
 	private String mResult;
+	private static int mTimeout = 2000;
 
+	 static public void setTimeout(int timeout_ms) {
+	   mTimeout = timeout_ms;
+	 }
+	 
 	/**
 	 * Constructor.
 	 */
@@ -51,8 +56,8 @@ class BlockingHttpRequest {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) mUrl
 					.openConnection();
-			connection.setConnectTimeout(1000);
-			connection.setReadTimeout(1500);
+			connection.setConnectTimeout(mTimeout);
+			connection.setReadTimeout(mTimeout);
 			connection.connect();
 			InputStream is = connection.getInputStream();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();

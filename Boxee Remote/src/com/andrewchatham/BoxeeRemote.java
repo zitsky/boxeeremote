@@ -2,6 +2,8 @@ package com.andrewchatham;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.content.Context;
@@ -36,8 +38,6 @@ public class BoxeeRemote extends Activity implements
 
   private final static int ACTIVITY_SCAN = 1;
 
-  private ArrayList<BoxeeServer> mServers;
-
   private String mHost;
   public static int mPort = BAD_PORT;
   private boolean mRequireWifi;
@@ -56,6 +56,10 @@ public class BoxeeRemote extends Activity implements
   private final static int CODE_DOWN = 271;
   private final static int CODE_SELECT = 256;
   private final static int CODE_BACK = 257;
+
+  // I made these up as unlikely codes to be used in XBMC's sendKey.
+  private final static int CODE_VOLUME_UP = 0xAABBCC2;
+  private final static int CODE_VOLUME_DOWN = 0xAABBCC1;
 
   final int KEY_ASCII = 0xF100;
   final int KEY_INVALID = 0xFFFF;
@@ -76,9 +80,9 @@ public class BoxeeRemote extends Activity implements
     setPreferences(prefs);
     prefs.registerOnSharedPreferenceChangeListener(this);
 
-    // Only send a discovery request if the user has done a scan before and
-    // picked a server.
     if (mAutoName != null && mAutoName.length() > 0) {
+      // Only send a discovery request if the user has done a scan before and
+      // picked a server.
       new Discoverer((WifiManager) getSystemService(Context.WIFI_SERVICE), this)
           .start();
     }
@@ -111,9 +115,10 @@ public class BoxeeRemote extends Activity implements
     settings.setIcon(android.R.drawable.ic_menu_preferences);
     settings.setIntent(new Intent(this, Preferences.class));
 
-//    MenuItem help = menu.add(getString(R.string.help));
-//    help.setIcon(android.R.drawable.ic_menu_help);
-//    help.setIntent(new Intent(this, Preferences.class));
+    // TODO
+    // MenuItem help = menu.add(getString(R.string.help));
+    // help.setIcon(android.R.drawable.ic_menu_help);
+    // help.setIntent(new Intent(this, Preferences.class));
 
     return true;
   }
@@ -170,10 +175,18 @@ public class BoxeeRemote extends Activity implements
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     int code = eventToBoxeeCode(keyCode, event);
-    if (code != KEY_INVALID) {
+
+    switch (code) {
+    case CODE_VOLUME_UP:
+      changeVolume(20);
+      return true;
+    case CODE_VOLUME_DOWN:
+      changeVolume(-20);
+      return true;
+    default:
       sendKeyPress(code, false);
       return true;
-    } else {
+    case KEY_INVALID:
       return super.onKeyDown(keyCode, event);
     }
   }
@@ -208,6 +221,10 @@ public class BoxeeRemote extends Activity implements
       return CODE_LEFT;
     case KeyEvent.KEYCODE_DPAD_RIGHT:
       return CODE_RIGHT;
+    case KeyEvent.KEYCODE_VOLUME_UP:
+      return CODE_VOLUME_UP;
+    case KeyEvent.KEYCODE_VOLUME_DOWN:
+      return CODE_VOLUME_DOWN;
 
     case KeyEvent.KEYCODE_SPACE:
     case KeyEvent.KEYCODE_ENTER:
@@ -227,9 +244,52 @@ public class BoxeeRemote extends Activity implements
    * @return URL to send to boxee, up to but not including the boxee command
    */
   public String getRequestPrefix() {
-    return String.format("http://%s:%d/xbmcCmds/xbmcHttp?command=", mHost, mPort);
+    return String.format("http://%s:%d/xbmcCmds/xbmcHttp?command=", mHost,
+        mPort);
   }
 
+  /**
+   * Tell boxee to change the volume. This involves doing a getVolume request,
+   * then a setVolume request.
+   * 
+   * @param percent
+   *          percent increase/decrease in volume
+   */
+  private void changeVolume(final int percent) {
+    final String getvolume = getRequestPrefix() + String.format("getVolume()");
+    // TODO: Move around
+    final Pattern VOLUME_RE = Pattern.compile("^<li>([0-9]+)",
+        Pattern.MULTILINE);
+
+    // First ask for the current volume.
+    try {
+      new HttpRequest(getvolume, new HttpRequest.Handler() {
+        public void HandleResponse(boolean success, String resp) {
+          if (!success) {
+            ShowErrorAsync("Problem fetching URL " + getvolume);
+          }
+
+          // Parse out the current volume and send a setvolume request.
+          Matcher m = VOLUME_RE.matcher(resp);
+          if (m != null && m.find()) {
+            int current_volume = Integer.parseInt(m.group(1));
+            int new_volume = Math.max(0, Math
+                .min(100, current_volume + percent));
+            Log.d(TAG, "Setting volume to " + new_volume);
+            final String setvolume = getRequestPrefix()
+                + String.format("setVolume(%d)", new_volume);
+            sendHttpCommand(setvolume, true);
+          } else {
+            Log.d(TAG, "Could not parse RE " + resp);
+          }
+        }
+      });
+    } catch (MalformedURLException e) {
+      ShowErrorAsync("Malformed URL: " + getvolume);
+    }
+  }
+
+  // TODO: Is fromAction necessary?
   private void sendKeyPress(int keycode, final boolean fromAction) {
     if (mHost == null || mHost.length() == 0) {
       ShowError("Go to settings and set the host");
@@ -254,8 +314,12 @@ public class BoxeeRemote extends Activity implements
 
     final String request = getRequestPrefix()
         + String.format("SendKey(%d)", keycode);
-    Log.d(TAG, "Fetching " + request);
+    sendHttpCommand(request, fromAction);
 
+  }
+
+  private void sendHttpCommand(final String request, final boolean fromAction) {
+    Log.d(TAG, "Fetching " + request);
     try {
       new HttpRequest(request, new HttpRequest.Handler() {
         public void HandleResponse(boolean success, String resp) {
@@ -330,16 +394,31 @@ public class BoxeeRemote extends Activity implements
    * @param prefs
    */
   private void setPreferences(SharedPreferences prefs) {
-    try {
-      mPort = Integer.parseInt(prefs.getString(getString(R.string.port_key),
-          null));
-    } catch (NumberFormatException e) {
-      mPort = BAD_PORT;
-      ShowError("Port must be a number");
-    }
-    mHost = prefs.getString(getString(R.string.host_key), null);
-    mRequireWifi = prefs.getBoolean(getString(R.string.require_wifi_key), true);
+
+    String host = prefs.getString(getString(R.string.host_key), null);
     mAutoName = prefs.getString(getString(R.string.discovered_name_key), null);
+
+    // Only set the host if it was non-empty. We don't want to overwrite the
+    // auto-discovered values.
+    if (host != null && host.length() > 0) {
+      mHost = host;
+      try {
+        mPort = Integer.parseInt(prefs.getString(getString(R.string.port_key),
+            "8800"));
+      } catch (NumberFormatException e) {
+        mPort = BAD_PORT;
+        ShowError("Port must be a number");
+      }
+    }
+
+    try {
+      int timeout_ms = Integer.parseInt(prefs.getString(
+          getString(R.string.timeout_key), "1000"));
+      BlockingHttpRequest.setTimeout(timeout_ms);
+    } catch (NumberFormatException e) {
+      ShowError("Timeout must be a number");
+    }
+    mRequireWifi = prefs.getBoolean(getString(R.string.require_wifi_key), true);
 
     boolean hidden = prefs.getBoolean(getString(R.string.hide_arrows), false);
     findViewById(R.id.table).setVisibility(hidden ? View.GONE : View.VISIBLE);
@@ -362,8 +441,9 @@ public class BoxeeRemote extends Activity implements
   public void addAnnouncedServers(ArrayList<BoxeeServer> servers) {
     if (mHost != null && mHost.length() > 0) {
       Log.d(TAG, "Skipping announced servers. Set manually");
+      return;
     }
-    
+
     for (int k = 0; k < servers.size(); ++k) {
       BoxeeServer server = servers.get(k);
       if (server.name().equals(mAutoName)) {
@@ -372,14 +452,15 @@ public class BoxeeRemote extends Activity implements
               .name()));
           continue;
         } else {
-          // Yay, found it.
+          // Yay, found it and it works
           mHost = server.address().getHostAddress();
           mPort = server.port();
           return;
         }
       }
     }
-    
-    ShowErrorAsync(String.format("Could not find preferred server '%s'", mAutoName));
+
+    ShowErrorAsync(String.format("Could not find preferred server '%s'",
+        mAutoName));
   }
 }

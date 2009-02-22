@@ -127,7 +127,9 @@ public class Discoverer extends Thread {
 
       sendDiscoveryRequest(socket);
       servers = listenForResponses(socket);
+      socket.close();
     } catch (IOException e) {
+      servers = new ArrayList<BoxeeServer>();  // use an empty one
       Log.e(TAG, "Could not send discovery request", e);
     }
     mReceiver.addAnnouncedServers(servers);

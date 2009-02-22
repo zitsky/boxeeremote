@@ -11,4 +11,5 @@
 
 
 
+<EditTextPreference android:title="@string/timeout_title" android:key="@string/timeout_key" android:summary="@string/timeout_summary" android:defaultValue="2000"></EditTextPreference>
 </PreferenceScreen>
