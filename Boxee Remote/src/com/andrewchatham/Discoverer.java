@@ -87,6 +87,12 @@ public class Discoverer extends Thread {
  		return InetAddress.getByAddress(quads);
 	}
 	
+	/**
+	 * Listen on socket for responses, timing out after TIMEOUT_MS
+	 * 
+	 * @param socket socket on which the announcement request was sent
+	 * @throws IOException
+	 */
 	private void listenForResponses(DatagramSocket socket) throws IOException {
 		byte[] buf = new byte[1024];
 		try {
