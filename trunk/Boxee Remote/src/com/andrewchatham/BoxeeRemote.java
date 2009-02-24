@@ -117,10 +117,13 @@ public class BoxeeRemote extends Activity implements
     settings.setIcon(android.R.drawable.ic_menu_preferences);
     settings.setIntent(new Intent(this, Preferences.class));
 
-    // TODO
-    // MenuItem help = menu.add(getString(R.string.help));
-    // help.setIcon(android.R.drawable.ic_menu_help);
-    // help.setIntent(new Intent(this, Preferences.class));
+//    MenuItem help = menu.add(R.string.help);
+//    help.setIcon(android.R.drawable.ic_menu_help);
+//    help.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+//      public boolean onMenuItemClick(MenuItem item) {
+//        return true;
+//      }
+//    });
 
     return true;
   }
