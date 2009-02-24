@@ -7,98 +7,99 @@ XBMC and Boxee support a set of remote commands. For example, to make the cursor
 
 = Details =
 
-action
-addtoplaylist
-addtoslideshow
-broadcast
-broadcastlevel
-choosealbum
-clearplaylist
-clearslideshow
-config
-copyfile
-deletefile
-downloadinternetfile
-execbuiltin
-exit
-filecopy
-filedelete
-filedownload
-filedownloadfrominternet
-fileexists
-filesize
-fileupload
-getbroadcast
-getcurrentlyplaying
-getcurrentplaylist
-getcurrentslide
-getdirectory
-getguidescription
-getguisetting
-getguistatus
-getkeyboardtext
-getloglevel
-getmediaitems
-getmedialocation
-getmoviedetails
-getmusiclabel
-getpercentage
-getplaylistcontents
-getplaylistlength
-getplaylistsong
-getplayspeed
-getrecordstatus
-getshares
-getslideshowcontents
-getsysteminfo
-getsysteminfobyname
-gettagfromfilename
-getthumb
-getthumbfilename
-getthumbnail
-getvideolabel
-getvolume
-getxbeid
-getxbetitle
-guisetting
-help
-keyrepeat
-lookupalbum
-move
-mute
-pause
-playfile
-playlistnext
-playlistprev
-playnext
-playprev
-playslideshow
-querymusicdatabase
-queryvideodatabase
-removefromplaylist
-reset
-restart
-restartapp
-rotate
-seekpercentage
-seekpercentagerelative
-sendkey
-setautogetpicturethumbs
-setbroadcast
-setcurrentplaylist
-setfile
-setguisetting
-setkey
-setloglevel
-setplaylistsong
-setplayspeed
-setresponseformat
-setvolume
-showpicture
-shutdown
-slideshowselect
-spindownharddisk
-stop
-takescreenshot
-webserverstatus
-zoom
+|| command || XBMC/Boxee Action || In remote app? ||
+|| action || || ||
+|| addtoplaylist || || ||
+|| addtoslideshow || || ||
+|| broadcast || || ||
+|| broadcastlevel || || ||
+|| choosealbum || || ||
+|| clearplaylist || || ||
+|| clearslideshow || || ||
+|| config || || ||
+|| copyfile || || ||
+|| deletefile || || ||
+|| downloadinternetfile || || ||
+|| execbuiltin || || ||
+|| exit || || ||
+|| filecopy || || ||
+|| filedelete || || ||
+|| filedownload || || ||
+|| filedownloadfrominternet || || ||
+|| fileexists || || ||
+|| filesize || || ||
+|| fileupload || || ||
+|| getbroadcast || || ||
+|| getcurrentlyplaying || || ||
+|| getcurrentplaylist || || ||
+|| getcurrentslide || || ||
+|| getdirectory || || ||
+|| getguidescription || || ||
+|| getguisetting || || ||
+|| getguistatus || || ||
+|| getkeyboardtext || || ||
+|| getloglevel || || ||
+|| getmediaitems || || ||
+|| getmedialocation || || ||
+|| getmoviedetails || || ||
+|| getmusiclabel || || ||
+|| getpercentage || || ||
+|| getplaylistcontents || || ||
+|| getplaylistlength || || ||
+|| getplaylistsong || || ||
+|| getplayspeed || || ||
+|| getrecordstatus || || ||
+|| getshares || || ||
+|| getslideshowcontents || || ||
+|| getsysteminfo || || ||
+|| getsysteminfobyname || || ||
+|| gettagfromfilename || || ||
+|| getthumb || || ||
+|| getthumbfilename || || ||
+|| getthumbnail || || ||
+|| getvideolabel || || ||
+|| getvolume || || ||
+|| getxbeid || || ||
+|| getxbetitle || || ||
+|| guisetting || || ||
+|| help || || ||
+|| keyrepeat || || ||
+|| lookupalbum || || ||
+|| move || || ||
+|| mute || || ||
+|| pause || || ||
+|| playfile || || ||
+|| playlistnext || || ||
+|| playlistprev || || ||
+|| playnext || || ||
+|| playprev || || ||
+|| playslideshow || || ||
+|| querymusicdatabase || || ||
+|| queryvideodatabase || || ||
+|| removefromplaylist || || ||
+|| reset || || ||
+|| restart || || ||
+|| restartapp || || ||
+|| rotate || || ||
+|| seekpercentage || || ||
+|| seekpercentagerelative || || ||
+|| sendkey || || ||
+|| setautogetpicturethumbs || || ||
+|| setbroadcast || || ||
+|| setcurrentplaylist || || ||
+|| setfile || || ||
+|| setguisetting || || ||
+|| setkey || || ||
+|| setloglevel || || ||
+|| setplaylistsong || || ||
+|| setplayspeed || || ||
+|| setresponseformat || || ||
+|| setvolume || || ||
+|| showpicture || || ||
+|| shutdown || || ||
+|| slideshowselect || || ||
+|| spindownharddisk || || ||
+|| stop || || ||
+|| takescreenshot || || ||
+|| webserverstatus || || ||
+|| zoom || || ||
