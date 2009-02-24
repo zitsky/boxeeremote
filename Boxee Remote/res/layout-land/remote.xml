@@ -8,9 +8,20 @@
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	android:focusable="false">
 
-	<ImageView android:id="@+id/thumbnail" android:layout_width="fill_parent"
-		android:layout_weight="1" android:layout_height="fill_parent"
-		android:scaleType="fitCenter" android:focusable="false" />
+	<LinearLayout android:id="@+id/nowplayinginfo"
+		android:orientation="vertical" android:layout_weight="1"
+		android:layout_height="fill_parent" android:focusable="false"
+		android:layout_width="fill_parent">
+		<ImageView android:id="@+id/thumbnail" android:layout_width="fill_parent"
+			android:layout_weight="1" android:layout_height="fill_parent"
+			android:scaleType="fitCenter" android:focusable="false" />
+
+		<TextView android:id="@+id/title" android:layout_height="wrap_content"
+			android:layout_width="wrap_content" />
+		<TextView android:id="@+id/timeinfo" android:layout_height="wrap_content"
+			android:layout_width="wrap_content" />
+
+	</LinearLayout>
 
 	<TableLayout android:id="@+id/table" android:layout_height="fill_parent"
 		android:layout_width="fill_parent" android:visibility="visible"
