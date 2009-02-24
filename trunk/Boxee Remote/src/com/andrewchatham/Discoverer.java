@@ -48,7 +48,7 @@ class BoxeeServer {
     try {
       mPort = Integer.parseInt(attributes.get("httpPort"));
     } catch (NumberFormatException e) {
-      mPort = BoxeeRemote.BAD_PORT;
+      mPort = Remote.BAD_PORT;
     }
 
     String auth = attributes.get("httpAuthRequired");
@@ -56,7 +56,7 @@ class BoxeeServer {
   }
 
   public boolean valid() {
-    return mPort != BoxeeRemote.BAD_PORT && mAddr != null;
+    return mPort != Remote.BAD_PORT && mAddr != null;
   }
 
   public String version() {

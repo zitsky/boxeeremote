@@ -8,15 +8,17 @@ import android.graphics.BitmapFactory;
 
 class CurrentlyPlayingThread extends Thread {
   private NowPlaying mPlaying;
-  private BoxeeRemote mRemote;
+  private BoxeeRemote mApp;
+  private Remote mRemote;
 
-  CurrentlyPlayingThread(BoxeeRemote remote) {
+  CurrentlyPlayingThread(BoxeeRemote app, Remote remote) {
     mRemote = remote;
+    mApp = app;
   }
 
   public void run() {
     downloadThumbnail();
-    mRemote.setNowPlaying(mPlaying);
+    mApp.setNowPlaying(mPlaying);
   }
 
   private void downloadThumbnail() {
