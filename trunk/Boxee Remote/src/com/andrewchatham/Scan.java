@@ -1,9 +1,6 @@
 package com.andrewchatham;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.app.ListActivity;
 import android.content.Context;
