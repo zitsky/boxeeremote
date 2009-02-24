@@ -7,7 +7,7 @@ XBMC and Boxee support a set of remote commands. For example, to make the cursor
 
 = Details =
 
-|| command || XBMC/Boxee Action || In remote app? ||
+|| *command* || *XBMC/Boxee Action* || *In remote app?* ||
 || action || || ||
 || addtoplaylist || || ||
 || addtoslideshow || || ||
