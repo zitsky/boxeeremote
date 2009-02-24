@@ -105,12 +105,12 @@ public class Remote {
 
   public void sendKeyPress(int keycode) {
     if (mHost == null || mHost.length() == 0) {
-      mError.ShowError("Go to settings and set the host");
+      mError.ShowError("Run scan or go to settings and set the host");
       return;
     }
 
     if (mPort == BAD_PORT) {
-      mError.ShowError("Go to settings and set the port");
+      mError.ShowError("Run scan or go to settings and set the port");
       return;
     }
 
