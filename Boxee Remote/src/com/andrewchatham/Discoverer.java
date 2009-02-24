@@ -1,7 +1,6 @@
 package com.andrewchatham;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -25,7 +24,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Parcel;
 import android.util.Log;
 
 /**

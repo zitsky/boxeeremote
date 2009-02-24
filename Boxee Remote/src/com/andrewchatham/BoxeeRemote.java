@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -26,6 +25,7 @@ import android.view.KeyCharacterMap.KeyData;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class BoxeeRemote extends Activity implements
@@ -94,14 +94,16 @@ public class BoxeeRemote extends Activity implements
     setButtonAction(R.id.select, CODE_SELECT);
     setButtonAction(R.id.back, CODE_BACK);
 
-    getThumbnail();
+    // Don't try to get the thumbnail until after the Discoverer had a chance to
+    // do its job.
+    getNowPlayingAfter(1000);
   }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
 
-    MenuItem scan = menu.add(getString(R.string.scan));
+    MenuItem scan = menu.add(R.string.scan);
     scan.setIcon(android.R.drawable.ic_menu_manage);
     scan.setIntent(new Intent(this, Scan.class));
     scan.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -111,7 +113,7 @@ public class BoxeeRemote extends Activity implements
       }
     });
 
-    MenuItem settings = menu.add(getString(R.string.settings));
+    MenuItem settings = menu.add(R.string.settings);
     settings.setIcon(android.R.drawable.ic_menu_preferences);
     settings.setIntent(new Intent(this, Preferences.class));
 
@@ -142,31 +144,46 @@ public class BoxeeRemote extends Activity implements
     }
   }
 
-  final int THUMBNAIL_DELAY_MS = 1000 * 10;
+  /**
+   * Set the NowPlaying information, such as the thumbnail image. Also schedule
+   * another fetch of the NowPlaying info after a few seconds.
+   * 
+   * @param playing
+   */
+  public void setNowPlaying(final NowPlaying playing) {
+    runOnUiThread(new Runnable() {
+      public void run() {
+        if (playing != null) {
+          ImageView view = (ImageView) findViewById(R.id.thumbnail);
+          view.setImageBitmap(playing.getThumbnail());
+
+          TextView title = (TextView) findViewById(R.id.title);
+          title.setText(playing.getTitle());
+
+          TextView time = (TextView) findViewById(R.id.timeinfo);
+          time.setText(playing.getTimeInfo());
+        }
+
+        // Schedule another attempt to get the currently playing.
+        getNowPlayingAfter(10000);
+      }
+    });
+  }
 
   /**
-   * Set the thumbnail image and schedule another fetch of the thumbnail after a
-   * few seconds.
+   * Schedule an attempt to get the currently-playing item.
    * 
-   * @param bmp
-   *          bitmap to set as the thumbnail, may be null
+   * @param delay_ms
+   *          Delay before attempt in milliseconds
    */
-  public void setThumbnail(Bitmap bmp) {
-    ImageView view = (ImageView) findViewById(R.id.thumbnail);
-    view.setImageBitmap(bmp);
-
-    // Schedule another attempt to get the thumbnail.
+  private void getNowPlayingAfter(int delay_ms) {
     Handler h = new Handler();
     Runnable r = new Runnable() {
       public void run() {
-        getThumbnail();
+        new CurrentlyPlayingThread(BoxeeRemote.this).start();
       }
     };
-    h.postDelayed(r, THUMBNAIL_DELAY_MS);
-  }
-
-  private void getThumbnail() {
-    new CurrentlyPlayingThread(BoxeeRemote.this).start();
+    h.postDelayed(r, delay_ms);
   }
 
   /**

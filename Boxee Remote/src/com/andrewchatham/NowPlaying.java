@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.graphics.Bitmap;
+
 /**
  * NowPlaying represents information we know about the currently playing item in
  * Boxee. It parses the information from Boxee's getcurrentlyplaying() function.
@@ -13,6 +15,7 @@ final class NowPlaying {
       "^<li>([A-Za-z]+):([^\n<]+)", Pattern.MULTILINE);
 
   private HashMap<String, String> mEntries;
+  private Bitmap mThumbnail;
 
   NowPlaying(String s) {
     Matcher m = LIST_ITEM.matcher(s);
@@ -31,4 +34,33 @@ final class NowPlaying {
     return mEntries.get("Thumb");
   }
 
+  String getTitle() {
+    return mEntries.get("Title");
+  }
+
+  public Bitmap getThumbnail() {
+    return mThumbnail;
+  }
+
+  public void setThumbnail(Bitmap thumbnail) {
+    mThumbnail = thumbnail;
+  }
+
+  /**
+   * Return the elapsed and total time of the track, if available
+   * 
+   * @return Elapsed and total time as a human-readable string.
+   */
+  public String getTimeInfo() {
+    String time = mEntries.get("Time");
+    String duration = mEntries.get("Duration");
+
+    if (time == null) {
+      return null;
+    } else if (duration == null) {
+      return "Elapsed: " + time;
+    } else {
+      return String.format("Elapsed: %s/%s", time, duration);
+    }
+  }
 }
