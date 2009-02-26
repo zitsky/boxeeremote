@@ -29,8 +29,10 @@ public class BoxeeRemote extends Activity implements
   public final static String TAG = BoxeeRemote.class.toString();
   public static final int PREFERENCES = Menu.FIRST;
   public static final int REQUEST_PREF = 1;
-
   private final static int ACTIVITY_SCAN = 1;
+  
+  private String mUser;
+  private String mPassword;
 
   /**
    * If the user has run a scan before, this is set to the name of their
@@ -126,6 +128,9 @@ public class BoxeeRemote extends Activity implements
       mRemote.setHostPort(data.getStringExtra("host"), data.getIntExtra("port",
           Remote.BAD_PORT));
       String name = data.getStringExtra("name");
+      
+      if (data.getBooleanExtra("auth", false))
+        passwordCheck();
 
       // Change the preferences to indicate that we should autodiscover the
       // server with this name next time.
@@ -307,6 +312,13 @@ public class BoxeeRemote extends Activity implements
 
     String host = prefs.getString(getString(R.string.host_key), null);
     mAutoName = prefs.getString(getString(R.string.discovered_name_key), null);
+    
+    mPassword = prefs.getString(getString(R.string.password_key), null);
+    mUser = prefs.getString(getString(R.string.user_key), null);
+    
+    if (mPassword != null && mPassword.length() > 0) {
+      BlockingHttpRequest.setUserPassword(mUser, mPassword);
+    }
 
     // Only set the host if it was non-empty. We don't want to overwrite the
     // auto-discovered values.
@@ -367,6 +379,8 @@ public class BoxeeRemote extends Activity implements
         } else {
           // Yay, found it and it works
           mRemote.setHostPort(server.address().getHostAddress(), server.port());
+          if (server.authRequired())
+            passwordCheck();
           return;
         }
       }
@@ -375,4 +389,10 @@ public class BoxeeRemote extends Activity implements
     ShowError(String.format("Could not find preferred server '%s'",
         mAutoName));
   }
-}
+  
+  private void passwordCheck() {
+    String password = BlockingHttpRequest.password(); 
+    if (password == null || password.length() == 0)
+      ShowError("Server requires password. Set one in preferences.");
+ }
+ }
