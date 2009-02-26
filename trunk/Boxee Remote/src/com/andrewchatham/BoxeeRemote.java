@@ -265,7 +265,6 @@ public class BoxeeRemote extends Activity implements
     button.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
         mRemote.sendKeyPress(keycode);
-        finish();
       }
     });
   }
