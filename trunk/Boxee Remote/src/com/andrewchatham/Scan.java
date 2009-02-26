@@ -62,6 +62,7 @@ public class Scan extends ListActivity implements Discoverer.Receiver {
     response.putExtra("host", server.address().getHostAddress());
     response.putExtra("port", server.port());
     response.putExtra("name", server.name());
+    response.putExtra("auth", server.authRequired());
     setResult(RESULT_OK, response); 
     finish();
   }

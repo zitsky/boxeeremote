@@ -36,4 +36,13 @@
 <string name="advanced_on">Show advanced options</string>
 <string name="advanced_off">Hide advanced options</string>
 <string name="advanced_title">Advanced Options</string>
+<string name="user_key">user</string>
+<string name="user_title">User</string>
+<string name="user_summary">Webserver username, default "xbox"</string>
+<string name="password_key">password</string>
+<string name="password_title">Password</string>
+
+<string name="password_summary">Only needed if you set a password on your server</string>
+<string name="authentication_section">Authentication</string>
+
 </resources>
