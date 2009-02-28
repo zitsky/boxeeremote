@@ -8,54 +8,7 @@
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	android:focusable="false">
 
-	<LinearLayout android:id="@+id/nowplayinginfo"
-		android:orientation="vertical" android:layout_weight="1"
-		android:layout_height="fill_parent" android:focusable="false"
-		android:layout_width="fill_parent">
-		<ImageView android:id="@+id/thumbnail" android:layout_width="fill_parent"
-			android:layout_weight="1" android:layout_height="fill_parent"
-			android:scaleType="fitCenter" android:focusable="false" />
+	<include android:layout_width="fill_parent" layout="@layout/nowplaying" />
+	<include android:layout_width="fill_parent" layout="@layout/navigation" />
 
-		<TextView android:id="@+id/title" android:layout_height="wrap_content"
-			android:layout_width="wrap_content" />
-		<TextView android:id="@+id/timeinfo" android:layout_height="wrap_content"
-			android:layout_width="wrap_content" />
-
-	</LinearLayout>
-
-	<TableLayout android:id="@+id/table" android:layout_height="fill_parent"
-		android:layout_width="fill_parent" android:visibility="visible"
-		android:focusable="false" android:layout_weight="1">
-		<TableRow android:layout_weight="1" android:layout_height="fill_parent"
-			android:layout_width="fill_parent" android:focusable="false">
-			<ImageButton android:id="@+id/up" android:src="@drawable/up"
-				android:layout_column="1" android:layout_height="wrap_content"
-				android:layout_width="wrap_content" android:focusable="false"
-				android:scaleType="fitXY" />
-		</TableRow>
-
-		<TableRow android:layout_height="fill_parent"
-			android:layout_weight="1" android:focusable="false">
-			<ImageButton android:id="@+id/left" android:src="@drawable/left"
-				android:layout_width="75dp" android:scaleType="fitXY"
-				android:focusable="false" />
-			<ImageButton android:id="@+id/select" android:src="@drawable/ok"
-				android:layout_width="75dp" android:scaleType="fitXY"
-				android:focusable="false" />
-
-			<ImageButton android:id="@+id/right" android:src="@drawable/right"
-				android:layout_width="75dp" android:scaleType="fitXY"
-				android:focusable="false" />
-		</TableRow>
-		<TableRow android:layout_height="fill_parent"
-			android:layout_weight="1">
-			<ImageButton android:id="@+id/back" android:src="@drawable/cancel"
-				android:layout_width="75dp" android:scaleType="fitXY"
-				android:focusable="false" />
-			<ImageButton android:id="@+id/down" android:src="@drawable/down"
-				android:layout_width="75dp" android:scaleType="fitXY"
-				android:layout_column="1" android:focusable="false" />
-		</TableRow>
-
-	</TableLayout>
 </LinearLayout>
