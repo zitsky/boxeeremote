@@ -60,7 +60,7 @@ Play around with these commands and let me know which you think would make good 
 || gettagfromfilename || || ||
 || getthumb || || ||
 || getthumbfilename || || ||
-|| getthumbnail || || ||
+|| getthumbnail || get base64-encoded thumbnail image || used to display thumbnail||
 || getvideolabel || || ||
 || getvolume() || return volume percent [0, 100] || first step of volume buttons||
 || getxbeid || || ||
@@ -93,7 +93,7 @@ Play around with these commands and let me know which you think would make good 
 || setcurrentplaylist || || ||
 || setfile || || ||
 || setguisetting || || ||
-|| setkey || || ||
+|| setkey || same as sendkey || ||
 || setloglevel || || ||
 || setplaylistsong || || ||
 || setplayspeed || || ||
