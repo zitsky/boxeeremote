@@ -98,7 +98,7 @@ Play around with these commands and let me know which you think would make good 
 || setplaylistsong || || ||
 || setplayspeed || || ||
 || setresponseformat || || ||
-|| setvolume(x) || set volume, x in [0, 100] || second step of volume buttons||
+|| setvolume(x) || set volume, x in `[`0, 100`]` || second step of volume buttons||
 || showpicture || || ||
 || shutdown || || ||
 || slideshowselect || || ||
