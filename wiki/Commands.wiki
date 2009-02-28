@@ -34,7 +34,7 @@ Play around with these commands and let me know which you think would make good 
 || filesize || || ||
 || fileupload || || ||
 || getbroadcast || || ||
-|| getcurrentlyplaying || || ||
+|| getcurrentlyplaying || information about the current track || used to display thumbnail and duration ||
 || getcurrentplaylist || || ||
 || getcurrentslide || || ||
 || getdirectory || || ||
@@ -62,7 +62,7 @@ Play around with these commands and let me know which you think would make good 
 || getthumbfilename || || ||
 || getthumbnail || || ||
 || getvideolabel || || ||
-|| getvolume || || ||
+|| getvolume() || return volume percent [0, 100] || first step of volume buttons||
 || getxbeid || || ||
 || getxbetitle || || ||
 || guisetting || || ||
@@ -87,7 +87,7 @@ Play around with these commands and let me know which you think would make good 
 || rotate || || ||
 || seekpercentage || || ||
 || seekpercentagerelative || || ||
-|| sendkey || || ||
+|| sendkey || send a keycode || used for most buttons and trackball ||
 || setautogetpicturethumbs || || ||
 || setbroadcast || || ||
 || setcurrentplaylist || || ||
@@ -98,7 +98,7 @@ Play around with these commands and let me know which you think would make good 
 || setplaylistsong || || ||
 || setplayspeed || || ||
 || setresponseformat || || ||
-|| setvolume || || ||
+|| setvolume(x) || set volume, x in [0, 100] || second step of volume buttons||
 || showpicture || || ||
 || shutdown || || ||
 || slideshowselect || || ||
