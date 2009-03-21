@@ -248,9 +248,12 @@ public class BoxeeRemote extends Activity implements
       return event.getUnicodeChar() + KEY_ASCII;
     }
 
-    if (Character.isLetterOrDigit(keyData.displayLabel)) {
+    String punctuation = "!@#$%^&*()[]{}/?|'\",.<>";
+    if (Character.isLetterOrDigit(keyData.displayLabel) ||
+        punctuation.indexOf(keyData.displayLabel) != -1) {
       return event.getUnicodeChar() + KEY_ASCII;
     }
+    
     return KEY_INVALID;
   }
 
