@@ -124,7 +124,7 @@ public class BoxeeRemote extends Activity implements
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    if (requestCode == ACTIVITY_SCAN) {
+    if (requestCode == ACTIVITY_SCAN && resultCode != RESULT_CANCELED) {
       mRemote.setHostPort(data.getStringExtra("host"), data.getIntExtra("port",
           Remote.BAD_PORT));
       String name = data.getStringExtra("name");
