@@ -41,6 +41,9 @@ public class Remote {
    *          percent increase/decrease in volume
    */
   public void changeVolume(final int percent) {
+	if (mHost == null)
+		return;
+	
     final String getvolume = getRequestPrefix() + String.format("getVolume()");
     // TODO: Move around
     final Pattern VOLUME_RE = Pattern.compile("^<li>([0-9]+)",
