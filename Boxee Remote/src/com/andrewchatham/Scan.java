@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -65,5 +66,13 @@ public class Scan extends ListActivity implements Discoverer.Receiver {
     response.putExtra("auth", server.authRequired());
     setResult(RESULT_OK, response); 
     finish();
+  }
+  
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+	  boolean returnValue = super.onKeyDown(keyCode, event);
+
+	  if (keyCode == KeyEvent.KEYCODE_BACK)
+		  setResult(RESULT_CANCELED);
+	  return returnValue;
   }
 }
