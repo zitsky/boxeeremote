@@ -190,6 +190,9 @@ public class BoxeeRemote extends Activity implements
    */
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
+	if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
+	  return super.onKeyDown(keyCode, event);
+	
     int code = eventToBoxeeCode(keyCode, event);
 
     switch (code) {
