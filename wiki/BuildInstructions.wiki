@@ -9,7 +9,7 @@ This page explains how to build the project in eclipse. If you haven't used ecli
 
   * Install [http://subclipse.tigris.org/ Subclipse], the subversion plugin for eclipse.
   * In Eclipse, go to Window -> Open Repository -> Other... and select "SVN Repository Browsing"
-  * In SVN Repositories, right-click, New -> Repository Location, and add "http://boxeeremote.googlecode.com/svn/trunk/"
+  * In SVN Repositories, right-click, New -> Repository Location, and add "http://boxeeremote.googlecode.com/svn/trunk/". Use https:// if you plan on making commits, as http:// will not work properly for this purpose.
   * Expand the new repository, and right-click on "Boxee Remote" and select Checkout. The defaults should be fine, so press OK.
 
 = Running =
