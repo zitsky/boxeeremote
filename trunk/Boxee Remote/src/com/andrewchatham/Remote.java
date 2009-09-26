@@ -51,7 +51,7 @@ public class Remote {
 
     // First ask for the current volume.
     try {
-      new HttpRequest(getvolume, new HttpRequest.Handler() {
+      new HttpRequest(getvolume, new Handler() {
         public void HandleResponse(boolean success, String resp) {
           if (!success) {
             mError.ShowError("Problem fetching URL " + getvolume);
@@ -94,7 +94,7 @@ public class Remote {
   private void sendHttpCommand(final String request) {
     Log.d(TAG, "Fetching " + request);
     try {
-      new HttpRequest(request, new HttpRequest.Handler() {
+      new HttpRequest(request, new Handler() {
         public void HandleResponse(boolean success, String resp) {
           if (!success) {
             mError.ShowError("Problem fetching URL " + request);
