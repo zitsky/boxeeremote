@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+  	android:layout_width="fill_parent"
+  	android:layout_height="fill_parent"
+  	android:background="@color/main_background"
+  	>
+		
+	<Button 
+		android:id="@+id/select" 
+		android:background="@drawable/ok"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content" 
+		android:focusable="false"
+		android:layout_centerInParent="true"
+		/>
+		
+	<Button 
+		android:id="@+id/up" 
+		android:background="@drawable/up"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content" 
+		android:focusable="false"
+		android:layout_above="@id/select"
+		android:layout_alignLeft="@id/select"
+		android:layout_alignRight="@id/select"
+		/>
+				
+	<Button 
+		android:id="@+id/down" 
+		android:background="@drawable/down"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content" 
+		android:focusable="false"
+		android:layout_below="@id/select"
+		android:layout_alignLeft="@id/select"
+		android:layout_alignRight="@id/select"
+		/>
+		
+	<Button 
+		android:id="@+id/left" 
+		android:background="@drawable/left"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content" 
+		android:focusable="false" 
+		android:layout_toLeftOf="@id/select"
+		android:layout_alignTop="@id/select"
+		android:layout_alignBottom="@id/select"
+		/>
+		
+	<Button 
+		android:id="@+id/right" 
+		android:background="@drawable/right"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content" 
+		android:focusable="false" 
+		android:layout_toRightOf="@id/select"
+		android:layout_alignTop="@id/select"
+		android:layout_alignBottom="@id/select"
+		/>
+		
+</RelativeLayout>
+
