@@ -69,6 +69,7 @@ public class BoxeeActivity extends Activity implements
 	private Point mTouchPoint = new Point();
 	private boolean mDragged = false;
 	private boolean mIsNowPlaying = false;
+	private boolean mIsScreenOverride = false;
 	private ProgressDialog mPleaseWaitDialog;
 
 	Handler mHandler = new Handler() {
@@ -281,9 +282,11 @@ public class BoxeeActivity extends Activity implements
 	private void refreshNowPlaying() {
 		mIsNowPlaying = mNowPlaying.isNowPlaying();
 
-		flipTo(mNowPlaying.isOnNowPlayingScreen() ? PAGE_NOWPLAYING : mSettings.getPage());
+		if (!mIsScreenOverride) 
+			flipTo(mNowPlaying.isOnNowPlayingScreen() ? PAGE_NOWPLAYING : mSettings.getPage());
 
 		if (!mIsNowPlaying) {
+			mIsScreenOverride = false;
 			if (mElapsedThread.isAlive())
 				mElapsedThread.stop();
 			return;
@@ -353,7 +356,7 @@ public class BoxeeActivity extends Activity implements
 
 		case KeyEvent.KEYCODE_BACK:
 			if (mFlipper.getDisplayedChild() == PAGE_NOWPLAYING) {
-				mRemote.back();
+				mIsScreenOverride = true;
 				flipTo(mSettings.getPage());
 				getNowPlayingAfter(100);
 			}
