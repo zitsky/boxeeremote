@@ -115,14 +115,12 @@ final class NowPlaying {
 	}
 
 	int getPercentage() {
-		if (mDuration == 0)
+		int duration = mDuration;
+		
+		if (duration == 0)
 			return 100;
-		
-		return getElapsedSeconds() * 100 / getDurationSeconds();
-		
-		// Not always accurate
-		//return mEntries.containsKey("Percentage") ? Integer.parseInt(mEntries
-		//		.get("Percentage")) : 0;
+
+		return getElapsedSeconds() * 100 / duration;
 	}
 
 	public Bitmap getThumbnail() {
