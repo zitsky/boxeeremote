@@ -26,6 +26,8 @@ public class Remote {
 	private final static int CODE_DOWN = 271;
 	private final static int CODE_SELECT = 256;
 	private final static int CODE_BACK = 275;
+	//special key for backspace
+	private final static int CODE_BACKSPACE = 61704;
 	private final static int KEY_ASCII = 0xF100;
 
 	interface ErrorHandler {
@@ -151,6 +153,11 @@ public class Remote {
 		sendKeyPress(CODE_SELECT);
 	}
 
+	public void sendBackspace()
+	{
+		sendKeyPress(CODE_BACKSPACE);
+	}
+	
 	public void keypress(int unicode) {
 		sendKeyPress(unicode + KEY_ASCII);
 	}

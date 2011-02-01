@@ -4,13 +4,10 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Point;
-import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -350,8 +347,9 @@ public class BoxeeActivity extends Activity implements
 		switch (code) {
 
 		case KeyEvent.KEYCODE_DEL:
-			mRemote.back();
-			getNowPlayingAfter(100);
+//			mRemote.back();
+//			getNowPlayingAfter(100);
+			mRemote.sendBackspace();
 			return true;
 
 		case KeyEvent.KEYCODE_BACK:
@@ -385,11 +383,11 @@ public class BoxeeActivity extends Activity implements
 			return true;
 
 		case KeyEvent.KEYCODE_VOLUME_UP:
-			mRemote.changeVolume(20);
+			mRemote.changeVolume(mSettings.getVolumeStep());
 			return true;
 
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
-			mRemote.changeVolume(-20);
+			mRemote.changeVolume((-1)*mSettings.getVolumeStep());
 			return true;
 
 		case KeyEvent.KEYCODE_SPACE:
@@ -405,7 +403,7 @@ public class BoxeeActivity extends Activity implements
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		if (mFlipper.getDisplayedChild() != PAGE_GESTURE)
+		if (mFlipper.getDisplayedChild() == PAGE_DPAD)
 			return false;
 
 		int x = (int) event.getX();
@@ -495,12 +493,24 @@ public class BoxeeActivity extends Activity implements
 	}
 
 	/**
+	 * sometimes, when there is no network, or stuff, I get lots of Toast windows
+	 * which do not disapear for a long time. I say, if the same error happens too often
+	 * there is no need to show it.
+	 */
+	private String mLastErrorMessage = null;
+	private long mLastErrorMessageTime = 0;
+	private static final long MINIMUM_ms_TIME_BETWEEN_ERRORS = 1000;//
+	/**
 	 * Display a short error via a popup message.
 	 */
 	private void ShowErrorInternal(String s) {
-		Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+		//checking for repeating error
+		final long currentTime = System.currentTimeMillis();
+		if ((!s.equals(mLastErrorMessage)) || ((currentTime - mLastErrorMessageTime) > MINIMUM_ms_TIME_BETWEEN_ERRORS))
+			Toast.makeText(this, s, Toast.LENGTH_SHORT).show();//we can show the error.
+		mLastErrorMessage = s;
+		mLastErrorMessageTime = currentTime;
 	}
-
 	/**
 	 * Show an error, may be called from any thread
 	 */
