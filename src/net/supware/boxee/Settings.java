@@ -23,6 +23,8 @@ public class Settings {
 	public static final String SENSITIVITY_KEY = "sensitivity";
 	public static final String REQUIRE_WIFI_KEY = "require_wifi";
 	public static final String TIMEOUT_KEY = "timeout";
+	private final String VOLUME_STEP_SIZE_KEY;
+	private final int VOLUME_STEP_SIZE_DEFAULT_VALUE;
 	
 	private SharedPreferences mPreferences;
 
@@ -31,8 +33,15 @@ public class Settings {
 		
 		// Attempt to set default values if they have not yet been set
 		PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
+		
+		VOLUME_STEP_SIZE_KEY = context.getString(R.string.volume_step_size_key);
+		VOLUME_STEP_SIZE_DEFAULT_VALUE = context.getResources().getInteger(R.integer.volume_step_size_default_value);
 	}
 
+	public int getVolumeStep() {
+		return mPreferences.getInt(VOLUME_STEP_SIZE_KEY, VOLUME_STEP_SIZE_DEFAULT_VALUE);
+	}
+	
 	public void putPage(int page) {
 		SharedPreferences.Editor editor = mPreferences.edit();
 		editor.putInt(PAGE_KEY, page);

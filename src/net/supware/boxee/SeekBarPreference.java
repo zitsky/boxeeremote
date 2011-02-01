@@ -21,6 +21,7 @@ public class SeekBarPreference extends Preference implements
 	private static final String ANDROIDNS = "http://schemas.android.com/apk/res/android";
 
 	private int maximum = 100;
+	private int minimum = 1;
 	private int interval = 5;
 	private float oldValue = 50;
 	private String mTitle;
@@ -28,20 +29,25 @@ public class SeekBarPreference extends Preference implements
 
 	public SeekBarPreference(Context context) {
 		super(context);
+		//setLayoutResource(R.layout.preference_seek_bar);
 	}
 
 	public SeekBarPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		//setLayoutResource(R.layout.preference_seek_bar_widget);
 		mTitle = attrs.getAttributeValue(ANDROIDNS, "title");
 		mSummary = attrs.getAttributeValue(ANDROIDNS, "summary");
 		oldValue = attrs.getAttributeIntValue(ANDROIDNS, "defaultValue", 50);
-		maximum = attrs.getAttributeIntValue(ANDROIDNS, "maxValue", 100);
-		interval = attrs.getAttributeIntValue(ANDROIDNS, "interval", 5);
+		maximum = attrs.getAttributeIntValue(null, "max", 100);
+		minimum = attrs.getAttributeIntValue(null, "min", 1);
+		interval = attrs.getAttributeIntValue(null, "interval", 5);
 	}
-
+	
 	public SeekBarPreference(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		//setLayoutResource(R.layout.preference_seek_bar);
 	}
+	
 
 	@Override
 	protected View onCreateView(ViewGroup parent) {
@@ -90,7 +96,9 @@ public class SeekBarPreference extends Preference implements
 	public void onProgressChanged(SeekBar seekBar, int progress,
 			boolean fromUser) {
 
-		progress = Math.round(((float) progress) / interval) * interval;
+		progress = validateValue(progress);
+		//validateValue does the round for us
+		//progress = Math.round(((float) progress) / interval) * interval;
 
 		if (!callChangeListener(progress)) {
 			seekBar.setProgress((int) this.oldValue);
@@ -135,8 +143,8 @@ public class SeekBarPreference extends Preference implements
 
 		if (value > maximum)
 			value = maximum;
-		else if (value < 0)
-			value = 0;
+		else if (value < minimum)
+			value = minimum;
 		else if (value % interval != 0)
 			value = Math.round(((float) value) / interval) * interval;
 
