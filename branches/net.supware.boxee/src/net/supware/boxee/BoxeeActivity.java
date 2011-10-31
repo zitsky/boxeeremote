@@ -3,19 +3,25 @@ package net.supware.boxee;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyCharacterMap.KeyData;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,9 +43,6 @@ public class BoxeeActivity extends Activity implements
 	public static final int MESSAGE_UPDATE_ELAPSED = 100;
 
 	// Menu items
-	private static final int MENU_MODE_GESTURE = Menu.FIRST;
-	private static final int MENU_MODE_DPAD = Menu.FIRST + 1;
-	private static final int MENU_SETTINGS = Menu.FIRST + 2;
 	private MenuItem mGestureMenuItem;
 	private MenuItem mDpadMenuItem;
 
@@ -48,6 +51,9 @@ public class BoxeeActivity extends Activity implements
 	private static final int PAGE_GESTURE = 1;
 	private static final int PAGE_NOWPLAYING = 2;
 	private ViewFlipper mFlipper;
+
+	// Dialog box
+	protected static final int DIALOG_ABOUT = 2;
 
 	// Other Views
 	ImageView mImageThumbnail;
@@ -163,26 +169,28 @@ public class BoxeeActivity extends Activity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		mGestureMenuItem = menu.add(Menu.NONE, MENU_MODE_GESTURE, 0,
-				R.string.menu_mode).setIcon(R.drawable.ic_menu_boxee_logo);
-
-		mDpadMenuItem = menu.add(Menu.NONE, MENU_MODE_DPAD, 0,
-				R.string.menu_mode).setIcon(R.drawable.ic_menu_dpad);
-
-		menu.add(Menu.NONE, MENU_SETTINGS, 0, R.string.settings).setIcon(
-				android.R.drawable.ic_menu_preferences).setIntent(
-				new Intent(this, SettingsActivity.class));
-
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
 		return true;
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+		if (hasActionBar())
+			return true;
+
+		if (mGestureMenuItem == null)
+			mGestureMenuItem = menu.findItem(R.id.menu_mode_gesture);
+		if (mDpadMenuItem == null)
+			mDpadMenuItem = menu.findItem(R.id.menu_mode_dpad);
+
 		boolean gesture = mFlipper.getDisplayedChild() == PAGE_GESTURE;
+
 		mGestureMenuItem.setEnabled(!gesture);
 		mGestureMenuItem.setVisible(!gesture);
 		mDpadMenuItem.setEnabled(gesture);
 		mDpadMenuItem.setVisible(gesture);
+
 		return true;
 	}
 
@@ -190,17 +198,22 @@ public class BoxeeActivity extends Activity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		switch (item.getItemId()) {
-		case MENU_MODE_GESTURE:
+		case R.id.menu_mode_gesture:
 			mSettings.putPage(PAGE_GESTURE);
 			return true;
 
-		case MENU_MODE_DPAD:
+		case R.id.menu_mode_dpad:
 			mSettings.putPage(PAGE_DPAD);
 			return true;
 
-		case MENU_SETTINGS:
-			// This is already handled by menu.setIntent in create
-			break;
+		case R.id.menu_settings:
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+
+		case R.id.menu_about:
+			showDialog(DIALOG_ABOUT);
+			return true;
+
 		}
 		return false;
 	}
@@ -259,6 +272,64 @@ public class BoxeeActivity extends Activity implements
 
 	}
 
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		AlertDialog.Builder builder;
+
+		switch (id) {
+
+		case DIALOG_ABOUT: {
+			builder = new AlertDialog.Builder(this);
+			builder.setIcon(R.drawable.launcher_icon);
+			builder.setTitle(R.string.app_name);
+			builder.setCancelable(true);
+
+			View view = View.inflate(this, R.layout.about_dialog_view, null);
+			((TextView) view).setText(getString(R.string.dialog_about,
+					getAppVersion()));
+			builder.setView(view);
+
+			builder.setPositiveButton(android.R.string.ok,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					});
+
+			return builder.create();
+		}
+		}
+
+		return null;
+	}
+
+	private PackageInfo getPackageInfo() {
+		try {
+			PackageInfo pkg = getPackageManager().getPackageInfo(
+					getPackageName(), 0);
+			return pkg;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private String getAppVersion() {
+		PackageInfo pkg = getPackageInfo();
+
+		String version = pkg == null ? null : pkg.versionName;
+
+		if (TextUtils.isEmpty(version))
+			version = getString(R.string.text_unknown);
+
+		return version;
+	}
+
+	private int getLauncherIconResId() {
+		PackageInfo pkg = getPackageInfo();
+		return pkg == null ? 0 : pkg.applicationInfo.icon;
+	}
+
 	private void flipTo(int page) {
 		if (mFlipper.getDisplayedChild() != page)
 			mFlipper.setDisplayedChild(page);
@@ -268,8 +339,8 @@ public class BoxeeActivity extends Activity implements
 		backButton.setVisibility(page == PAGE_NOWPLAYING ? View.GONE
 				: View.VISIBLE);
 
-		int arrowVisibility = page == PAGE_NOWPLAYING
-		|| !mIsNowPlaying ? View.GONE : View.VISIBLE;
+		int arrowVisibility = page == PAGE_NOWPLAYING || !mIsNowPlaying ? View.GONE
+				: View.VISIBLE;
 		Button nowPlayingButton = (Button) findViewById(R.id.nowplaying);
 		nowPlayingButton.setVisibility(arrowVisibility);
 		mTextArrowTitle.setVisibility(arrowVisibility);
@@ -279,8 +350,9 @@ public class BoxeeActivity extends Activity implements
 	private void refreshNowPlaying() {
 		mIsNowPlaying = mNowPlaying.isNowPlaying();
 
-		if (!mIsScreenOverride) 
-			flipTo(mNowPlaying.isOnNowPlayingScreen() ? PAGE_NOWPLAYING : mSettings.getPage());
+		if (!mIsScreenOverride)
+			flipTo(mNowPlaying.isOnNowPlayingScreen() ? PAGE_NOWPLAYING
+					: mSettings.getPage());
 
 		if (!mIsNowPlaying) {
 			mIsScreenOverride = false;
@@ -333,13 +405,11 @@ public class BoxeeActivity extends Activity implements
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		int code = event.getKeyCode();
 
-		KeyData keyData = new KeyData();
-		event.getKeyData(keyData);
 		Log.d(TAG, "Unicode is " + event.getUnicodeChar());
 
 		String punctuation = "!@#$%^&*()[]{}/?|'\",.<>";
-		if (Character.isLetterOrDigit(keyData.displayLabel)
-				|| punctuation.indexOf(keyData.displayLabel) != -1) {
+		if (Character.isLetterOrDigit(event.getDisplayLabel())
+				|| punctuation.indexOf(event.getDisplayLabel()) != -1) {
 			mRemote.keypress(event.getUnicodeChar());
 			return true;
 		}
@@ -347,8 +417,8 @@ public class BoxeeActivity extends Activity implements
 		switch (code) {
 
 		case KeyEvent.KEYCODE_DEL:
-//			mRemote.back();
-//			getNowPlayingAfter(100);
+			// mRemote.back();
+			// getNowPlayingAfter(100);
 			mRemote.sendBackspace();
 			return true;
 
@@ -357,8 +427,7 @@ public class BoxeeActivity extends Activity implements
 				mIsScreenOverride = true;
 				flipTo(mSettings.getPage());
 				getNowPlayingAfter(100);
-			}
-			else
+			} else
 				return super.onKeyDown(keyCode, event);
 			return true;
 
@@ -387,7 +456,7 @@ public class BoxeeActivity extends Activity implements
 			return true;
 
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
-			mRemote.changeVolume((-1)*mSettings.getVolumeStep());
+			mRemote.changeVolume((-1) * mSettings.getVolumeStep());
 			return true;
 
 		case KeyEvent.KEYCODE_SPACE:
@@ -493,24 +562,28 @@ public class BoxeeActivity extends Activity implements
 	}
 
 	/**
-	 * sometimes, when there is no network, or stuff, I get lots of Toast windows
-	 * which do not disapear for a long time. I say, if the same error happens too often
-	 * there is no need to show it.
+	 * sometimes, when there is no network, or stuff, I get lots of Toast
+	 * windows which do not disapear for a long time. I say, if the same error
+	 * happens too often there is no need to show it.
 	 */
 	private String mLastErrorMessage = null;
 	private long mLastErrorMessageTime = 0;
 	private static final long MINIMUM_ms_TIME_BETWEEN_ERRORS = 1000;//
+
 	/**
 	 * Display a short error via a popup message.
 	 */
 	private void ShowErrorInternal(String s) {
-		//checking for repeating error
+		// checking for repeating error
 		final long currentTime = System.currentTimeMillis();
-		if ((!s.equals(mLastErrorMessage)) || ((currentTime - mLastErrorMessageTime) > MINIMUM_ms_TIME_BETWEEN_ERRORS))
-			Toast.makeText(this, s, Toast.LENGTH_SHORT).show();//we can show the error.
+		if ((!s.equals(mLastErrorMessage))
+				|| ((currentTime - mLastErrorMessageTime) > MINIMUM_ms_TIME_BETWEEN_ERRORS))
+			Toast.makeText(this, s, Toast.LENGTH_SHORT).show();// we can show
+																// the error.
 		mLastErrorMessage = s;
 		mLastErrorMessageTime = currentTime;
 	}
+
 	/**
 	 * Show an error, may be called from any thread
 	 */
@@ -547,14 +620,13 @@ public class BoxeeActivity extends Activity implements
 		if (mSettings.isManual()) {
 			mRemote.setServer(mSettings.constructServer());
 			getNowPlayingAfter(100);
-		}
-		else {
+		} else {
 			mPleaseWaitDialog = ProgressDialog.show(this, "", "Connecting to "
 					+ mSettings.getServerName() + "...", true);
 			DiscovererThread discoverer = new DiscovererThread(this, this);
 			discoverer.start();
 		}
-		
+
 		// Setup the HTTP timeout.
 		int timeout_ms = mSettings.getTimeout();
 		HttpRequestBlocking.setTimeout(timeout_ms);
@@ -620,4 +692,7 @@ public class BoxeeActivity extends Activity implements
 			ShowError("Server requires password. Set one in preferences.");
 	}
 
+	private boolean hasActionBar() {
+		return Build.VERSION.SDK_INT >= 11;
+	}
 }

@@ -2,17 +2,16 @@ package net.supware.boxee;
 
 import java.net.URLEncoder;
 
-import org.apache.commons.codec.binary.Base64;
-
 import android.graphics.BitmapFactory;
 import android.os.Handler;
+import android.util.Base64;
 
 class CurrentlyPlayingThread extends Thread {
 	private static final String TAG = CurrentlyPlayingThread.class.toString();
-	
+
 	public static final int MESSAGE_NOW_PLAYING_UPDATED = 1;
 	public static final int MESSAGE_THUMBNAIL_UPDATED = 2;
-	
+
 	private NowPlaying mPlaying;
 	private Handler mHandler;
 	private Remote mRemote;
@@ -27,11 +26,12 @@ class CurrentlyPlayingThread extends Thread {
 		if (!getCurrentlyPlaying())
 			return;
 
-		mHandler.sendMessage(mHandler.obtainMessage(MESSAGE_NOW_PLAYING_UPDATED));
-		
+		mHandler.sendMessage(mHandler
+				.obtainMessage(MESSAGE_NOW_PLAYING_UPDATED));
+
 		if (mPlaying.getThumbnailUrl() == null)
 			return;
-		
+
 		if (!getThumbnail())
 			return;
 
@@ -40,10 +40,10 @@ class CurrentlyPlayingThread extends Thread {
 
 	private boolean getCurrentlyPlaying() {
 
-		HttpRequestBlocking r = new HttpRequestBlocking(mRemote
-				.getRequestString("getcurrentlyplaying()"));
+		HttpRequestBlocking r = new HttpRequestBlocking(
+				mRemote.getRequestString("getcurrentlyplaying()"));
 		r.fetch();
-		
+
 		if (!r.success())
 			return false;
 
@@ -52,28 +52,28 @@ class CurrentlyPlayingThread extends Thread {
 
 		r = new HttpRequestBlocking(mRemote.getRequestString("getguistatus()"));
 		r.fetch();
-		
+
 		if (!r.success())
 			return false;
 
 		mPlaying.addEntriesFrom(r.response());
-		
+
 		return true;
 	}
 
 	private boolean getThumbnail() {
 		final String request = mRemote.getRequestPrefix()
-				+ String.format("getthumbnail(%s)", URLEncoder.encode(mPlaying
-						.getThumbnailUrl()));
+				+ String.format("getthumbnail(%s)",
+						URLEncoder.encode(mPlaying.getThumbnailUrl()));
 		HttpRequestBlocking r;
 		r = new HttpRequestBlocking(request);
 		r.fetch();
 		if (!r.success()) {
 			return false;
 		}
-		String shorter = r.response().replaceAll("<html>", "").replaceAll(
-				"</html>", "");
-		byte[] thumb = Base64.decodeBase64(shorter.getBytes());
+		String shorter = r.response().replaceAll("<html>", "")
+				.replaceAll("</html>", "");
+		byte[] thumb = Base64.decode(shorter, Base64.DEFAULT);
 		mPlaying.setThumbnail(BitmapFactory.decodeByteArray(thumb, 0,
 				thumb.length));
 
